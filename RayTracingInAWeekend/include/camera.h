@@ -26,15 +26,18 @@ public:
 
 
 
-    void render(const hittable &world) {
+    void render(const hittable &world, const std::filesystem::path& output_file_path = std::filesystem::path("out") / "image.ppm") {
         initialize();
 
         // Ensure output directory exists and open output file
-        std::filesystem::create_directories("out");
-        std::ofstream out_file("out/image.ppm");
+        const auto output_dir = output_file_path.parent_path();
+        if (!output_dir.empty()) {
+            std::filesystem::create_directories(output_dir);
+        }
+        std::ofstream out_file(output_file_path);
         if (!out_file)
         {
-            std::cerr << "Could not open output file: out/image.ppm\n";
+            std::cerr << "Could not open output file: " << output_file_path << "\n";
             return;
         }
 
