@@ -1,0 +1,5 @@
+# Ignore the .vscode directory which contains Visual Studio Code workspace settings and tasks.
+.vscode/
+
+# Ignore the out directory which contains compiled binaries and object files.
+out/
