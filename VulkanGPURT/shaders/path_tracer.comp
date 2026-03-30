@@ -1,0 +1,65 @@
+#version 450
+
+layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
+
+const float PI = 3.14159265359;
+const uint MATERIAL_LAMBERTIAN = 0u;
+const uint MATERIAL_METAL = 1u;
+const uint MATERIAL_DIELECTRIC = 2u;
+
+struct Sphere {
+    vec4 centerRadius;
+    vec4 albedoMaterialType;
+    vec4 materialParams;
+};
+
+layout(std430, binding = 0) readonly buffer SceneBuffer {
+    Sphere spheres[];
+} sceneBuffer;
+
+layout(std430, binding = 1) writeonly buffer OutputBuffer {
+    vec4 pixels[];
+} outputBuffer;
+
+struct CameraData {
+    vec4 lookFromDefocusAngle;
+    vec4 lookAtFocusDist;
+    vec4 viewUpVfov;
+};
+
+layout(std430, binding = 2) readonly buffer CameraBuffer {
+    CameraData camera;
+} cameraBuffer;
+
+layout(push_constant) uniform PushConstants {
+    uint width;
+    uint height;
+    uint sphereCount;
+    uint samplesPerPixel;
+    uint maxBounces;
+    uint seed;
+} pc;
+
+#include "path_tracer_lib.glsl"
+
+void main() {
+    // Get the pixel coordinates from the global invocation ID of the executing thread
+    uvec2 pixel = gl_GlobalInvocationID.xy;
+    if (pixel.x >= pc.width || pixel.y >= pc.height) {
+        return;
+    }
+
+    // Calculate a unique seed for the random number generator based on the pixel index and a global seed
+    uint index = pixel.y * pc.width + pixel.x;
+    uint seed = index * 9781u + pc.seed * 6271u;
+
+    vec3 sampleColor = vec3(0.0);   // Accumulate color samples for anti-aliasing and noise reduction
+
+    for (uint s = 0u; s < pc.samplesPerPixel; ++s) {
+        Ray ray = makeCameraRay(pixel, seed);               // Generate a ray from the camera through the pixel
+        sampleColor += rayColor(ray, seed);         // Trace the ray through the scene and accumulate its color
+    }
+
+    sampleColor /= max(float(pc.samplesPerPixel), 1.0);         // Average the accumulated color samples to get the final color for the pixel
+    outputBuffer.pixels[index] = vec4(sampleColor, 1.0);        // Write the final color to the output buffer
+}

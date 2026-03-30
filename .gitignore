@@ -3,6 +3,8 @@
 
 # Ignore the out directory which contains compiled binaries and object files.
 out/
+build/
 
 *.obj
 *.pdb
+*.spv
