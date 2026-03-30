@@ -1,5 +1,8 @@
 # Path Tracer C++ Implementation
 
+![Path Tracer Render](docs/image.png)
+
+
 This repository contains your path tracer implementation in two versions:
 
 1. `RayTracingInAWeekend`: CPU implementation following [Ray Tracing in One Weekend](https://raytracing.github.io/).
