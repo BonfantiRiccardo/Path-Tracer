@@ -1,6 +1,6 @@
 # Path Tracer C++ Implementation
 
-![Path Tracer Render](docs/image.png)
+![Path Tracer Render](docs/weekend.png)
 
 
 This repository contains your path tracer implementation in two versions:
@@ -9,6 +9,15 @@ This repository contains your path tracer implementation in two versions:
 2. `VulkanGPURT`: GPU implementation using a Vulkan compute shader (headless, no window/swapchain), writing the final image to a `.ppm` file.
 
 Both versions render the same style of path-traced scenes and produce image output files.
+
+## Hardcoded scenes results
+![Room Interior Scene](docs/room_interior.png)
+- `room_interior.png`: Render of the "room interior" scene with a Cornell box setup and a light source.
+![Abstract Life Scene](docs/abstract_life.png)
+- `abstract_life.png`: Render of the "abstract life" scene with a more artistic arrangement of objects and materials.
+![Cornell Box Scene](docs/cornell_box.png)
+- `cornell_box.png`: Render of the classic Cornell box scene with two boxes.
+
 
 ## Build And Run (CPU)
 

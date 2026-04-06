@@ -7,11 +7,18 @@ class material {
   public:
     virtual ~material() = default;
 
-    virtual bool scatter(
-        const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered
-    ) const {
-        return false;
-    }
+  // Scatter incoming ray. Returns true if the ray is scattered and sets
+  // `attenuation` and `scattered`. Default: no scattering.
+  virtual bool scatter(
+    const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered
+  ) const {
+    return false;
+  }
+
+  // Emitted radiance from the material (for emissive materials). Default: black.
+  virtual color emitted() const {
+    return color(0,0,0);
+  }
 };
 
 /**
@@ -22,17 +29,26 @@ class lambertian : public material {
   public:
     lambertian(const color& albedo) : albedo(albedo) {}
 
+    color get_albedo() const { return albedo; }
+
     bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered)
     const override {
-        auto scatter_direction = rec.normal + random_unit_vector();
+      // Cosine-weighted hemisphere sampling using an ONB built from the hit normal.
+      vec3 w = rec.normal;
+      vec3 a = (std::fabs(w.x()) > 0.9) ? vec3(0,1,0) : vec3(1,0,0);
+      vec3 u = unit_vector(cross(a, w));
+      vec3 v = cross(w, u);
 
-        // Catch degenerate scatter direction
-        if (scatter_direction.near_zero())  // if record normal is opposite of random unit vector, scatter direction is close to zero
-            scatter_direction = rec.normal;
+      vec3 rd = random_cosine_direction(); // local-space sample (z is up)
+      auto scatter_direction = u * rd.x() + v * rd.y() + w * rd.z();
 
-        scattered = ray(rec.p, scatter_direction);
-        attenuation = albedo;
-        return true;
+      // Catch degenerate scatter direction
+      if (scatter_direction.near_zero())
+        scatter_direction = rec.normal;
+
+      scattered = ray(rec.p, scatter_direction);
+      attenuation = albedo;
+      return true;
     }
 
   private:
@@ -102,6 +118,26 @@ class dielectric : public material {
         r0 = r0*r0;
         return r0 + (1-r0)*std::pow((1 - cosine),5);
     }
+};
+
+/**
+ * Simple diffuse emissive material. Does not scatter rays, but returns an
+ * emitted color when hit.
+ */
+class diffuse_light : public material {
+  public:
+    diffuse_light(const color& c) : emit(c) {}
+
+    bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered) const override {
+        return false;
+    }
+
+    color emitted() const override {
+        return emit;
+    }
+
+  private:
+    color emit;
 };
 
 #endif
