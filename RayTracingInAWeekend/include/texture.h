@@ -2,6 +2,7 @@
 #define TEXTURE_H
 
 #include "rtw_stb_image.h"
+#include "perlin.h"
 
 class texture {
   public:
@@ -79,6 +80,24 @@ class image_texture : public texture {
 
   private:
     rtw_image image;
+};
+
+/**
+ * Noise texture that generates a procedural noise pattern based on Perlin noise
+ * The value of the texture at a given point is determined by the noise function, the result is a grayscale texture that 
+ * is used to create realistic-looking surfaces
+ */
+class noise_texture : public texture {
+  public:
+    noise_texture(double scale) : scale(scale) {}
+
+    color value(double u, double v, const point3& p) const override {
+        return color(1,1,1) * noise.noise(scale * p);
+    }
+
+  private:
+    perlin noise;\
+    double scale;
 };
 
 #endif // TEXTURE_H

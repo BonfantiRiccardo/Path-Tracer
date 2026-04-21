@@ -5,3 +5,4 @@
 #include "cornell_box.h"
 #include "checkered_spheres.h"
 #include "earth_scene.h"
+#include "perlin_spheres.h"

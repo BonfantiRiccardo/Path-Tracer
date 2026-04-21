@@ -8,7 +8,7 @@ int main(int argc, char* argv[]) {
     hittable_list world;
     camera cam;
 
-    cam = earth_scene(world);
+    cam = perlin_spheres(world);
 
     std::filesystem::path output_image = std::filesystem::path("out") / "image.ppm";
     if (argc > 0) {
