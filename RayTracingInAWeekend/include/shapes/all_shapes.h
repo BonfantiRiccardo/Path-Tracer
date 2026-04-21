@@ -1,7 +1,8 @@
 #include "sphere.h"
 #include "cylinder.h"
-#include "plane.h"
 #include "AABB.h"
-#include "triangle.h"
 #include "cone.h"
-#include "xz_rect.h"
+
+#include "2D/plane.h"
+#include "2D/quad.h"
+#include "2D/triangle.h"

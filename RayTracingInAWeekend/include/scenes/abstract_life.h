@@ -48,8 +48,8 @@ inline camera build_abstract_life_scene(hittable_list& world) {
     world.add(make_shared<cone>(point3(-1.5, 0.5, 1.0), 0.5, point3(-3.5, 0.0, 2.5), gold));
 
     // 6. Triangles (Used as glass shards leaning against the copper AABB)
-    world.add(make_shared<triangle>(point3(1.5, 0.0, 0.5), point3(0.8, 0.0, 0.0), point3(1.5, 0.8, -0.2), vividYellow));
-    world.add(make_shared<triangle>(point3(1.5, 0.0, 1.0), point3(2.2, 0.0, 1.2), point3(1.5, 0.6, 0.5), vividMagenta));
+    world.add(make_shared<triangle>(point3(1.5, 0.0, 0.5), vec3(0.8, 0.0, 0.0), vec3(1.5, 0.8, -0.2), vividYellow));
+    world.add(make_shared<triangle>(point3(1.5, 0.0, 1.0), vec3(2.2, 0.0, 1.2), vec3(1.5, 0.6, 0.5), vividMagenta));
 
     camera cam;
     cam.aspect_ratio      = 16.0 / 9.0;

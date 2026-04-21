@@ -59,12 +59,12 @@ inline camera build_room_interior_scene(hittable_list& world) {
 
     // 6. Triangles (A folded paper airplane on the floor)
     // Left wing
-    world.add(make_shared<triangle>(point3(-0.5, 0.01, 2.5), point3(0.5, 0.01, 2.8), point3(0.0, 0.15, 2.8), paperWhite));
+    world.add(make_shared<triangle>(point3(-0.5, 0.01, 2.5), vec3(0.5, 0.01, 2.8), vec3(0.0, 0.15, 2.8), paperWhite));
     // Right wing
-    world.add(make_shared<triangle>(point3( 0.5, 0.01, 3.1), point3(-0.5, 0.01, 2.5), point3(0.0, 0.15, 2.8), paperWhite));
+    world.add(make_shared<triangle>(point3( 0.5, 0.01, 3.1), vec3(-0.5, 0.01, 2.5), vec3(0.0, 0.15, 2.8), paperWhite));
 
     // 7. Ceiling area light (downward-facing)
-    world.add(make_shared<xz_rect>(-1.2, 1.2, -2.7, -0.7, 3.8, ceilingLight, vec3(0, -1, 0)));
+    world.add(make_shared<quad>(point3(-2.0, 4.99, -2.0), vec3(4.0, 0, 0), vec3(0, 0, 4.0), ceilingLight));
 
     camera cam;
     cam.aspect_ratio      = 16.0 / 9.0;

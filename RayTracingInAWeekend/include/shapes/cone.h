@@ -3,7 +3,7 @@
 
 #include "../raytracing.h"
 #include "../hittable.h"
-#include "plane.h"
+#include "2D/plane.h"
 
 /**
  * A cone class that inherits from the hittable interface. It represents a cone in 3D space and implements the hit function to determine if 

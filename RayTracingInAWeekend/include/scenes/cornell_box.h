@@ -58,20 +58,20 @@ inline camera build_cornell_box_scene(hittable_list& world) {
 
     // 6. Triangles
     // Leaning against the tall chrome box
-    world.add(make_shared<triangle>(point3(-0.6, 0.0, -0.8), point3(-0.2, 0.0, -1.2), point3(-0.6, 1.0, -1.0), vividYellow));
+    world.add(make_shared<triangle>(point3(-0.6, 0.0, -0.8), vec3(-0.2, 0.0, -1.2), vec3(-0.6, 1.0, -1.0), vividYellow));
     // Lying flat on top of the short box
-    world.add(make_shared<triangle>(point3(0.6, 1.201, -0.8), point3(1.6, 1.201, -0.8), point3(1.1, 1.201, -0.1), vividRed));
+    world.add(make_shared<triangle>(point3(0.6, 1.201, -0.8), vec3(1.6, 1.201, -0.8), vec3(1.1, 1.201, -0.1), vividRed));
 
     // Larger rectangular ceiling light to illuminate the Cornell box (area light)
     auto ceiling_light = make_shared<diffuse_light>(color(8.0, 8.0, 8.0));
     // x-range and z-range sized to fit inside the box; normal points downwards
-    world.add(make_shared<xz_rect>(-1.0, 1.0, -1.0, 1.0, 4.6, ceiling_light, vec3(0, -1, 0)));
+    world.add(make_shared<quad>(point3(-1.0, 4.99, -1.0), vec3(2.0, 0, 0), vec3(0, 0, 2.0), ceiling_light));
 
     camera cam;
 
     cam.aspect_ratio      = 1.0; // Classic Cornell Box renders are usually perfectly square (1:1)
-    cam.image_width       = 600;
-    cam.samples_per_pixel = 400;
+    cam.image_width       = 300;
+    cam.samples_per_pixel = 100;
     cam.max_depth         = 10;
 
     // Viewing from outside the open front of the box, looking directly in

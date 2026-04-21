@@ -3,7 +3,7 @@
 
 #include "../raytracing.h"
 #include "../hittable.h"
-#include "plane.h"
+#include "2D/plane.h"
 
 /**
  * A cylinder class that inherits from the hittable interface. It represents a cylinder in 3D space 

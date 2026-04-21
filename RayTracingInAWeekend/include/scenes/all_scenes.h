@@ -6,3 +6,4 @@
 #include "checkered_spheres.h"
 #include "earth_scene.h"
 #include "perlin_spheres.h"
+#include "quads_scene.h"
