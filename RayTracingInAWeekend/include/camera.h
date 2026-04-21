@@ -128,7 +128,9 @@ private:
         auto ray_origin = (defocus_angle <= 0) ? center : defocus_disk_sample();
         auto ray_direction = pixel_sample - ray_origin;
 
-        return ray(ray_origin, ray_direction);
+        auto ray_time = random_double();
+
+        return ray(ray_origin, ray_direction, ray_time);
     }
 
     /** 
@@ -202,7 +204,7 @@ private:
                                         double pdf = (1.0 / double(n)) * pdf_area;
                                         if (pdf > 0) {
                                             auto Le = light->get_material()->emitted();
-                                            color albedo = lam->get_albedo();
+                                            color albedo = lam->getTextureValue(rec.u, rec.v, rec.p);
                                             color f = albedo / pi; // Lambertian BRDF
                                             color contrib = Le * f * (cos_theta * cos_light) / (dist2 * pdf);
                                             direct_light += contrib;

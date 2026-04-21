@@ -1,10 +1,9 @@
-#ifndef SCENE_WEEKEND_H
-#define SCENE_WEEKEND_H
+#ifndef SCENE_BOUNCING_SPHERES_H
+#define SCENE_BOUNCING_SPHERES_H
 
 #include "scene_headers.h"
 
-inline camera build_weekend_scene(hittable_list &world) {
-
+inline camera build_bouncing_spheres_scene(hittable_list &world) {
     // Create a ground object that renders a checkered texture
     auto checker = make_shared<checker_texture>(0.32, color(.2, .3, .1), color(.9, .9, .9));
     world.add(make_shared<sphere>(point3(0,-1000,0), 1000, make_shared<lambertian>(checker)));
@@ -25,7 +24,8 @@ inline camera build_weekend_scene(hittable_list &world) {
                     // diffuse
                     auto albedo = color::random() * color::random();
                     sphere_material = make_shared<lambertian>(albedo);
-                    world.add(make_shared<sphere>(center, 0.2, sphere_material));
+                    auto center2 = center + vec3(0, random_double(0,.5), 0);
+                    world.add(make_shared<sphere>(center, center2, 0.2, sphere_material));                
                 }
                 else if (choose_mat < 0.95)
                 {
@@ -56,9 +56,9 @@ inline camera build_weekend_scene(hittable_list &world) {
 
     camera cam;
     cam.aspect_ratio = 16.0 / 9.0;
-    cam.image_width = 1200;
-    cam.samples_per_pixel = 20;
-    cam.max_depth = 10;
+    cam.image_width       = 400;
+    cam.samples_per_pixel = 100;
+    cam.max_depth         = 50;
 
     cam.vfov = 20;
     cam.lookfrom = point3(13, 2, 3);
@@ -71,4 +71,4 @@ inline camera build_weekend_scene(hittable_list &world) {
     return cam;
 }
 
-#endif // SCENE_WEEKEND_H
+#endif // SCENE_BOUNCING_SPHERES_H

@@ -13,8 +13,34 @@ class cone : public hittable {
   public:
     cone(const point3& center, double radius, point3 apex, shared_ptr<material> mat) : center(center), radius(std::fmax(0,radius)), apex(apex), mat(mat) {
         vec3 height = center - apex;
-        if (height.length() < 1e-8) return; // Degenerate cone (height is zero)
-        vec3 height_norm = unit_vector(height);
+        double height_len = height.length();
+
+        if (height_len < 1e-8) {
+            // Skip degenerate zero-height cones.
+            bbox = bvh_aabb::empty;
+            return;
+        }
+
+        vec3 height_norm = height / height_len;
+
+        // Compute the bounding box of the cone by finding the maximum extent in the x, y, z directions 
+        // based on the radius and height of the cone. Formula: r * sqrt(1 - (height_norm.x)^2)
+        double x_extent = radius * std::sqrt(std::fmax(0.0, 1.0 - height_norm.x()*height_norm.x()));
+        double y_extent = radius * std::sqrt(std::fmax(0.0, 1.0 - height_norm.y()*height_norm.y()));
+        double z_extent = radius * std::sqrt(std::fmax(0.0, 1.0 - height_norm.z()*height_norm.z()));
+
+        point3 bbox_min(
+            std::fmin(apex.x(), center.x() - x_extent),
+            std::fmin(apex.y(), center.y() - y_extent),
+            std::fmin(apex.z(), center.z() - z_extent)
+        );
+        point3 bbox_max(
+            std::fmax(apex.x(), center.x() + x_extent),
+            std::fmax(apex.y(), center.y() + y_extent),
+            std::fmax(apex.z(), center.z() + z_extent)
+        );
+        bbox = bvh_aabb(bbox_min, bbox_max);
+
         base = make_shared<plane>(center, height_norm, mat); // Base plane of the cone facing downwards
     }
     
@@ -122,12 +148,15 @@ class cone : public hittable {
 
     }
 
+        bvh_aabb bounding_box() const override { return bbox; }
+
   private:
     point3 center;
     double radius;
     point3 apex;
     shared_ptr<plane> base = nullptr;
     shared_ptr<material> mat;
+        bvh_aabb bbox;
     
         shared_ptr<material> get_material() const override { return mat; }
         double area() const override { return 0.0; }

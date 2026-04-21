@@ -1,0 +1,7 @@
+#include "abstract_life.h"
+#include "bouncing_spheres.h"
+#include "weekend.h"
+#include "room_interior.h"
+#include "cornell_box.h"
+#include "checkered_spheres.h"
+#include "earth_scene.h"

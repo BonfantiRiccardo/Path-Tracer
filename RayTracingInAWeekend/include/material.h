@@ -2,6 +2,7 @@
 #define MATERIAL_H
 
 #include "hittable.h"
+#include "texture.h"
 
 class material {
   public:
@@ -27,32 +28,28 @@ class material {
  */
 class lambertian : public material {
   public:
-    lambertian(const color& albedo) : albedo(albedo) {}
-
-    color get_albedo() const { return albedo; }
+    lambertian(const color& albedo) : tex(make_shared<solid_color>(albedo)) {}
+    lambertian(shared_ptr<texture> tex) : tex(tex) {}
 
     bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered)
     const override {
-      // Cosine-weighted hemisphere sampling using an ONB built from the hit normal.
-      vec3 w = rec.normal;
-      vec3 a = (std::fabs(w.x()) > 0.9) ? vec3(0,1,0) : vec3(1,0,0);
-      vec3 u = unit_vector(cross(a, w));
-      vec3 v = cross(w, u);
+        auto scatter_direction = rec.normal + random_unit_vector();
 
-      vec3 rd = random_cosine_direction(); // local-space sample (z is up)
-      auto scatter_direction = u * rd.x() + v * rd.y() + w * rd.z();
+        // Catch degenerate scatter direction
+        if (scatter_direction.near_zero())
+            scatter_direction = rec.normal;
 
-      // Catch degenerate scatter direction
-      if (scatter_direction.near_zero())
-        scatter_direction = rec.normal;
+        scattered = ray(rec.p, scatter_direction, r_in.time());
+        attenuation = tex->value(rec.u, rec.v, rec.p);
+        return true;
+    }
 
-      scattered = ray(rec.p, scatter_direction);
-      attenuation = albedo;
-      return true;
+    color getTextureValue(double u, double v, const point3& p) const {
+        return tex->value(u, v, p);
     }
 
   private:
-    color albedo;
+    shared_ptr<texture> tex;
 };
 
 
@@ -67,7 +64,7 @@ class metal : public material {
     bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered) const override {
         vec3 reflected = reflect(r_in.direction(), rec.normal);
         reflected = unit_vector(reflected) + (fuzz * random_unit_vector());
-        scattered = ray(rec.p, reflected);
+        scattered = ray(rec.p, reflected, r_in.time());
         attenuation = albedo;
         return (dot(scattered.direction(), rec.normal) > 0);
     }
@@ -103,7 +100,7 @@ class dielectric : public material {
         else
             direction = refract(unit_direction, rec.normal, ri);
 
-        scattered = ray(rec.p, direction);
+        scattered = ray(rec.p, direction, r_in.time());
         return true;
     }
 

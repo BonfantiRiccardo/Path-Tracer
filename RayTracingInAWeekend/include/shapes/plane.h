@@ -10,7 +10,39 @@
  */
 class plane : public hittable {
   public:
-    plane(const point3& center, const vec3& normal, shared_ptr<material> mat) : center(center), normal(normal), mat(mat) {}
+  plane(const point3& center, const vec3& normal, shared_ptr<material> mat) : center(center), normal(normal), mat(mat) {
+    const double slab_half_thickness = 1e-4; // A small thickness that allows intersection with rays that are very close
+    const double axis_alignment_eps = 1e-6; // A small threshold to determine if the plane is axis-aligned
+
+     // If the normal vector is very close to zero, treat the plane as having an infinite bounding box.
+    if (normal.length() < axis_alignment_eps) {
+      bbox = bvh_aabb(point3(-infinity, -infinity, -infinity), point3(infinity, infinity, infinity));
+      return;
+    }
+
+    vec3 unit_n = unit_vector(normal);
+    // For axis-aligned planes, we can create a thin bounding box (slab) that extends infinitely 
+    // in the two directions parallel to the plane and has a small thickness in the direction of the normal. 
+    if (std::fabs(unit_n.x()) > 1.0 - axis_alignment_eps) {
+      bbox = bvh_aabb(
+        point3(center.x() - slab_half_thickness, -infinity, -infinity),
+        point3(center.x() + slab_half_thickness, infinity, infinity)
+      );
+    } else if (std::fabs(unit_n.y()) > 1.0 - axis_alignment_eps) {
+      bbox = bvh_aabb(
+        point3(-infinity, center.y() - slab_half_thickness, -infinity),
+        point3(infinity, center.y() + slab_half_thickness, infinity)
+      );
+    } else if (std::fabs(unit_n.z()) > 1.0 - axis_alignment_eps) {
+      bbox = bvh_aabb(
+        point3(-infinity, -infinity, center.z() - slab_half_thickness),
+        point3(infinity, infinity, center.z() + slab_half_thickness)
+      );
+    } else {
+      // A tilted infinite plane has an infinite axis-aligned bounding box.
+      bbox = bvh_aabb(point3(-infinity, -infinity, -infinity), point3(infinity, infinity, infinity));
+    }
+  }
 
     /**
      * Plane equation is: N · (P - P0) = 0, where N is the normal vector of the plane, P0 is a point on the plane (center), and P is any point on the plane.
@@ -52,14 +84,17 @@ class plane : public hittable {
         return false;
     }
 
+    bvh_aabb bounding_box() const override { return bbox; }
+
   private:
     point3 center;
     vec3 normal;
     shared_ptr<material> mat;
+    bvh_aabb bbox;
     
     shared_ptr<material> get_material() const override { return mat; }
     double area() const override { return 0.0; }
     bool sample_surface(point3 &p, vec3 &n, double &pdf) const override { return false; }
 };
 
-#endif
+#endif // PLANE_H

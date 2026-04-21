@@ -19,6 +19,7 @@ class hittable_list : public hittable {
 
     void add(shared_ptr<hittable> object) {
         objects.push_back(object);
+        bbox = bvh_aabb(bbox, object->bounding_box());
     }
 
     bool hit(const ray& r, interval ray_t, hit_record& rec) const override {
@@ -38,6 +39,11 @@ class hittable_list : public hittable {
 
         return hit_anything;
     }
+
+    bvh_aabb bounding_box() const override { return bbox; }
+
+    private:
+        bvh_aabb bbox; // Bounding box for the entire list, used for BVH construction
 };
 
 #endif

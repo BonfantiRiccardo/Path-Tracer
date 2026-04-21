@@ -8,6 +8,7 @@ inline camera build_room_interior_scene(hittable_list& world) {
     auto floorWood  = make_shared<lambertian>(color(0.35, 0.25, 0.15));
     auto wallPaint  = make_shared<lambertian>(color(0.90, 0.90, 0.92));
     auto tableWood  = make_shared<lambertian>(color(0.60, 0.40, 0.20));
+    auto ceilingLight = make_shared<diffuse_light>(color(7.0, 7.0, 7.0));
     
     auto rubberRed  = make_shared<lambertian>(color(0.80, 0.15, 0.20));
     auto paperWhite = make_shared<lambertian>(color(0.95, 0.95, 0.95));
@@ -62,11 +63,14 @@ inline camera build_room_interior_scene(hittable_list& world) {
     // Right wing
     world.add(make_shared<triangle>(point3( 0.5, 0.01, 3.1), point3(-0.5, 0.01, 2.5), point3(0.0, 0.15, 2.8), paperWhite));
 
+    // 7. Ceiling area light (downward-facing)
+    world.add(make_shared<xz_rect>(-1.2, 1.2, -2.7, -0.7, 3.8, ceilingLight, vec3(0, -1, 0)));
+
     camera cam;
     cam.aspect_ratio      = 16.0 / 9.0;
     cam.image_width       = 1200;
     cam.samples_per_pixel = 100;
-    cam.max_depth         = 10;
+    cam.max_depth         = 5;
 
     // Viewed from human height, looking slightly downward into the room
     cam.vfov     = 50;

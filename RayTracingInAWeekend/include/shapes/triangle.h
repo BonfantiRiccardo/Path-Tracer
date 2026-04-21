@@ -10,7 +10,29 @@
  */
 class triangle : public hittable {
   public:
-    triangle(const point3& v0, const point3& v1, const point3& v2, shared_ptr<material> mat) : v0(v0), v1(v1), v2(v2), mat(mat) {}
+    triangle(const point3& v0, const point3& v1, const point3& v2, shared_ptr<material> mat) : v0(v0), v1(v1), v2(v2), mat(mat) {
+        const double min_side = 1e-6;       // Minimum side length to prevent degenerate bounding boxes for very small triangles
+
+        // Compute the bounding box of the triangle by finding the minimum and maximum x, y, z coordinates among the three vertices.
+        interval ix(
+            std::fmin(v0.x(), std::fmin(v1.x(), v2.x())),
+            std::fmax(v0.x(), std::fmax(v1.x(), v2.x()))
+        );
+        interval iy(
+            std::fmin(v0.y(), std::fmin(v1.y(), v2.y())),
+            std::fmax(v0.y(), std::fmax(v1.y(), v2.y()))
+        );
+        interval iz(
+            std::fmin(v0.z(), std::fmin(v1.z(), v2.z())),
+            std::fmax(v0.z(), std::fmax(v1.z(), v2.z()))
+        );
+
+        if (ix.size() < min_side) ix = ix.expand(min_side);
+        if (iy.size() < min_side) iy = iy.expand(min_side);
+        if (iz.size() < min_side) iz = iz.expand(min_side);
+
+        bbox = bvh_aabb(ix, iy, iz);
+    }
 
     /**
      * Triangle equation is: (P - v0) · (edge1 × edge2) = 0, where P is a point on the triangle, v0 is one of the triangle vertices, 
@@ -60,113 +82,18 @@ class triangle : public hittable {
 
     }
 
+        bvh_aabb bounding_box() const override { return bbox; }
+
   private:
     point3 v0;
     point3 v1;
     point3 v2;
     shared_ptr<material> mat;
+        bvh_aabb bbox;
     
         shared_ptr<material> get_material() const override { return mat; }
         double area() const override { return 0.0; }
         bool sample_surface(point3 &p, vec3 &n, double &pdf) const override { return false; }
 };
 
-#endif
-
-
-/*
-Triangle
-
-Triangles are essential if eventually you want to render meshes or OBJ files.
-
-Use the ray-triangle intersection formula with barycentric coordinates.
-
-Given triangle vertices 
-𝑣
-0
-,
-𝑣
-1
-,
-𝑣
-2
-v
-0
-	​
-
-,v
-1
-	​
-
-,v
-2
-	​
-
-:
-
-𝑒
-1
-=
-𝑣
-1
-−
-𝑣
-0
-e
-1
-	​
-
-=v
-1
-	​
-
-−v
-0
-	​
-
-𝑒
-2
-=
-𝑣
-2
-−
-𝑣
-0
-e
-2
-	​
-
-=v
-2
-	​
-
-−v
-0
-	​
-
-ℎ
-=
-𝑑
-×
-𝑒
-2
-h=d×e
-2
-	​
-
-𝑎
-=
-𝑒
-1
-⋅
-ℎ
-a=e
-1
-	​
-
-⋅h
-
-Then use the Möller-Trumbore algorithm.
-
-This is one of the most important primitives because any mesh can be decomposed into triangles.
-*/
+#endif // TRIANGLE_H

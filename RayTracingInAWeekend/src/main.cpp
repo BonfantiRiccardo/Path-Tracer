@@ -1,4 +1,5 @@
-#include "../include/scenes/shapes.h"
+#include "../include/scenes/all_scenes.h"
+#include "../include/bvh_node.h"
 
 #include <filesystem>
 
@@ -7,7 +8,7 @@ int main(int argc, char* argv[]) {
     hittable_list world;
     camera cam;
 
-    cam = build_shapes_scene(world);
+    cam = earth_scene(world);
 
     std::filesystem::path output_image = std::filesystem::path("out") / "image.ppm";
     if (argc > 0) {
@@ -16,6 +17,8 @@ int main(int argc, char* argv[]) {
             output_image = executable_path.parent_path() / "image.ppm";
         }
     }
+
+    world = hittable_list(make_shared<bvh_node>(world));
 
     cam.render(world, output_image);
 

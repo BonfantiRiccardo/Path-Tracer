@@ -13,8 +13,34 @@ class cylinder : public hittable {
   public:
     cylinder(const point3& center1, const point3& center2, double radius, shared_ptr<material> mat) : center1(center1), center2(center2), radius(std::fmax(0,radius)), mat(mat) {
         vec3 a = center2 - center1;
-        if (a.length() < 1e-8) return;
-        vec3 anorm = a / a.length();
+        double height = a.length();
+
+        if (height < 1e-8) {
+            // Skip degenerate zero-height cylinders.
+            bbox = bvh_aabb::empty;
+            return;
+        }
+
+        vec3 anorm = a / height;
+
+        // Compute the bounding box of the cylinder by finding the maximum extent in the x, y, z directions
+        // based on the radius and the orientation of the cylinder axis. Formula: r * sqrt(1 - (anorm.x)^2)
+        double x_extent = radius * std::sqrt(std::fmax(0.0, 1.0 - anorm.x()*anorm.x()));
+        double y_extent = radius * std::sqrt(std::fmax(0.0, 1.0 - anorm.y()*anorm.y()));
+        double z_extent = radius * std::sqrt(std::fmax(0.0, 1.0 - anorm.z()*anorm.z()));
+
+        point3 bbox_min(
+            std::fmin(center1.x(), center2.x()) - x_extent,
+            std::fmin(center1.y(), center2.y()) - y_extent,
+            std::fmin(center1.z(), center2.z()) - z_extent
+        );
+        point3 bbox_max(
+            std::fmax(center1.x(), center2.x()) + x_extent,
+            std::fmax(center1.y(), center2.y()) + y_extent,
+            std::fmax(center1.z(), center2.z()) + z_extent
+        );
+        bbox = bvh_aabb(bbox_min, bbox_max);
+
         bottom = make_shared<plane>(center1, -anorm, mat);
         top = make_shared<plane>(center2, anorm, mat);
     }
@@ -123,6 +149,8 @@ class cylinder : public hittable {
         return true;
     }
 
+        bvh_aabb bounding_box() const override { return bbox; }
+
   private:
     point3 center1;
     point3 center2;
@@ -130,6 +158,7 @@ class cylinder : public hittable {
     shared_ptr<plane> top = nullptr;
     double radius;
     shared_ptr<material> mat;
+        bvh_aabb bbox;
     
     shared_ptr<material> get_material() const override { return mat; }
     double area() const override { return 0.0; }

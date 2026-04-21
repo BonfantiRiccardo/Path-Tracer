@@ -1,7 +1,7 @@
 #ifndef HITTABLE_H
 #define HITTABLE_H
 
-#include "raytracing.h"
+#include "BVH_AABB.h"
 
 class material;
 class hittable; // forward declare so hit_record can hold a shared_ptr
@@ -15,6 +15,8 @@ class hit_record {
     vec3 normal;
     shared_ptr<material> mat;
     double t;
+    double u;
+    double v;
     bool front_face;
     shared_ptr<hittable> ptr; // pointer back to the hit object
 
@@ -43,6 +45,9 @@ class hittable {
     // Sample a point on the surface (uniformly) and return the surface normal and pdf.
     // Return true if sampling is supported for this primitive.
     virtual bool sample_surface(point3 &p, vec3 &normal, double &pdf) const { return false; }
+
+    // Return the axis-aligned bounding box of the primitive for BVH construction.
+    virtual bvh_aabb bounding_box() const = 0;
 };
 
 #endif

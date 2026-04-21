@@ -11,7 +11,23 @@
  */
 class aabb : public hittable {
   public:
-    aabb(const point3& min, const point3& max, shared_ptr<material> mat) : min(min), max(max), mat(mat) {}
+    aabb(const point3& min, const point3& max, shared_ptr<material> mat)
+        : min(  // Ensure min and max are correctly ordered regardless of input
+            point3(
+                std::fmin(min.x(), max.x()),
+                std::fmin(min.y(), max.y()),
+                std::fmin(min.z(), max.z())
+            )
+        ),
+        max(    // Ensure min and max are correctly ordered regardless of input
+            point3(
+                std::fmax(min.x(), max.x()),
+                std::fmax(min.y(), max.y()),
+                std::fmax(min.z(), max.z())
+            )
+        ),
+        mat(mat),
+        bbox(this->min, this->max) {}   // The bounding box of the AABB is just itself
 
     /**
      * AABB equation is: min.x <= P.x <= max.x, min.y <= P.y <= max.y, min.z <= P.z <= max.z, where P is a point on the box, 
@@ -80,6 +96,8 @@ class aabb : public hittable {
         return true;
     }
 
+    bvh_aabb bounding_box() const override { return bbox; }
+
     shared_ptr<material> get_material() const override { return mat; }
     double area() const override { return 0.0; }
     bool sample_surface(point3 &p, vec3 &n, double &pdf) const override { return false; }
@@ -88,6 +106,7 @@ class aabb : public hittable {
     point3 min;
     point3 max;
     shared_ptr<material> mat;
+    bvh_aabb bbox;
 };
 
 #endif
