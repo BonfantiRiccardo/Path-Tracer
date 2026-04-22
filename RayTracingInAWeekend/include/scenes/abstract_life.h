@@ -56,6 +56,7 @@ inline camera build_abstract_life_scene(hittable_list& world) {
     cam.image_width       = 1200;
     cam.samples_per_pixel = 100;
     cam.max_depth         = 10;
+    cam.background        = color(0.70, 0.80, 1.00);
 
     cam.vfov     = 40;
     cam.lookfrom = point3(0.0, 3.5, 8.0);

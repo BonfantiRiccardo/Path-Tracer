@@ -7,3 +7,4 @@
 #include "earth_scene.h"
 #include "perlin_spheres.h"
 #include "quads_scene.h"
+#include "light_scene.h"

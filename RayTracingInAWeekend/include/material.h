@@ -10,14 +10,16 @@ class material {
 
   // Scatter incoming ray. Returns true if the ray is scattered and sets
   // `attenuation` and `scattered`. Default: no scattering.
-  virtual bool scatter(
-    const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered
-  ) const {
+  virtual bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered) const {
     return false;
   }
 
   // Emitted radiance from the material (for emissive materials). Default: black.
   virtual color emitted() const {
+    return color(0,0,0);
+  }
+
+  virtual color emitted(double u, double v, const point3& p) const {
     return color(0,0,0);
   }
 };
@@ -123,18 +125,15 @@ class dielectric : public material {
  */
 class diffuse_light : public material {
   public:
-    diffuse_light(const color& c) : emit(c) {}
+    diffuse_light(shared_ptr<texture> tex) : tex(tex) {}
+    diffuse_light(const color& emit) : tex(make_shared<solid_color>(emit)) {}
 
-    bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered) const override {
-        return false;
-    }
-
-    color emitted() const override {
-        return emit;
+    color emitted(double u, double v, const point3& p) const override {
+        return tex->value(u, v, p);
     }
 
   private:
-    color emit;
+    shared_ptr<texture> tex;
 };
 
-#endif
+#endif // MATERIAL_H

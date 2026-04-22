@@ -17,6 +17,7 @@ public:
     int    image_width       = 100;     // Rendered image width in pixel count
     int    samples_per_pixel = 10;      // Count of random samples for each pixel
     int    max_depth         = 10;      // Maximum number of ray bounces into scene
+    color  background;                  // Scene background color
 
     double vfov = 90;  // Vertical view angle (field of view)
     point3 lookfrom = point3(0,0,0);   // Point camera is looking from
@@ -115,7 +116,6 @@ private:
         defocus_disk_v = v * defocus_radius;
     }
 
-
     /**
      * Returns a ray originating from the defocus disk and directed at a randomly sampled point around the pixel location i, j.
      */
@@ -140,6 +140,7 @@ private:
         return vec3(random_double() - 0.5, random_double() - 0.5, 0);
     }
 
+    // Returns a random point in the camera defocus disk.
     point3 defocus_disk_sample() const {
         // Returns a random point in the camera defocus disk.
         auto p = random_in_unit_disk();
@@ -156,83 +157,22 @@ private:
 
             
         hit_record rec;
-        if (world.hit(r, interval(0.001, infinity), rec)) {
-            // Emitted radiance from the hit material
-            color emitted = rec.mat ? rec.mat->emitted() : color(0,0,0);
+        
+        // If the ray hits nothing, return the background color.
+        if (!world.hit(r, interval(0.001, infinity), rec))
+            return background;
 
-            // Next-Event Estimation (direct lighting) for diffuse materials
-            color direct_light(0,0,0);
+        ray scattered;
+        color attenuation;
+        color color_from_emission = rec.mat->emitted(rec.u, rec.v, rec.p);
 
-            // Only perform NEE for lambertian BRDFs (diffuse)
-            if (rec.mat) {
-                auto lam = dynamic_cast<const lambertian*>(rec.mat.get());
-                if (lam) {
-                    // Attempt to find emissive objects in the scene
-                    const hittable_list* list = dynamic_cast<const hittable_list*>(&world);
-                    if (list && !list->objects.empty()) {
-                        // Collect emissive area lights
-                        std::vector<shared_ptr<hittable>> lights;
-                        for (const auto &obj : list->objects) {
-                            auto m = obj->get_material();
-                            if (!m) continue;
-                            auto Le = m->emitted();
-                            if (Le.x() > 0 || Le.y() > 0 || Le.z() > 0) {
-                                if (obj->area() > 0.0) lights.push_back(obj);
-                            }
-                        }
+        if (!rec.mat->scatter(r, rec, attenuation, scattered))
+            return color_from_emission;
 
-                        if (!lights.empty()) {
-                            int n = static_cast<int>(lights.size());
-                            int idx = static_cast<int>(random_double(0, (double)n));
-                            auto light = lights[idx];
+        color color_from_scatter = attenuation * ray_color(scattered, depth-1, world);
 
-                            point3 p_light;
-                            vec3 n_light;
-                            double pdf_area = 0.0;
-                            if (light->sample_surface(p_light, n_light, pdf_area) && pdf_area > 0.0) {
-                                vec3 to_light = p_light - rec.p;
-                                double dist2 = to_light.length_squared();
-                                double dist = std::sqrt(dist2);
-                                vec3 wi = unit_vector(to_light);
-                                double cos_theta = dot(rec.normal, wi);
-                                double cos_light = dot(n_light, -wi);
-                                if (cos_theta > 0 && cos_light > 0) {
-                                    // Shadow ray
-                                    ray shadow(rec.p + 1e-4 * wi, wi);
-                                    hit_record tmp;
-                                    if (!world.hit(shadow, interval(1e-4, dist - 1e-4), tmp)) {
-                                        double pdf = (1.0 / double(n)) * pdf_area;
-                                        if (pdf > 0) {
-                                            auto Le = light->get_material()->emitted();
-                                            color albedo = lam->getTextureValue(rec.u, rec.v, rec.p);
-                                            color f = albedo / pi; // Lambertian BRDF
-                                            color contrib = Le * f * (cos_theta * cos_light) / (dist2 * pdf);
-                                            direct_light += contrib;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+        return color_from_emission + color_from_scatter;
 
-            // If the material scatters, accrue emitted + direct lighting + attenuated recursive contribution.
-            ray scattered;
-            color attenuation;
-            if (rec.mat && rec.mat->scatter(r, rec, attenuation, scattered)) {
-                return emitted + direct_light + attenuation * ray_color(scattered, depth-1, world);
-            }
-
-            // Non-scattering material (e.g. pure light) -> return emitted radiance (no scattering)
-            return emitted + direct_light;
-        }
-
-        vec3 unit_direction = unit_vector(r.direction());
-        auto a = 0.5 * (unit_direction.y() + 1.0);
-        // Linear interpolation between white and blue based on the y component of the ray direction.
-        // This creates a gradient background.
-        return (1.0 - a) * color(1.0, 1.0, 1.0) + a * color(0.5, 0.7, 1.0);
     }
 };
 

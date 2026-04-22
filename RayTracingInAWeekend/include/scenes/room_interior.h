@@ -71,6 +71,7 @@ inline camera build_room_interior_scene(hittable_list& world) {
     cam.image_width       = 1200;
     cam.samples_per_pixel = 100;
     cam.max_depth         = 5;
+    cam.background        = color(0.70, 0.80, 1.00);
 
     // Viewed from human height, looking slightly downward into the room
     cam.vfov     = 50;

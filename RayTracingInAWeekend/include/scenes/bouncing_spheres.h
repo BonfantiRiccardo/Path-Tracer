@@ -55,10 +55,11 @@ inline camera build_bouncing_spheres_scene(hittable_list &world) {
     world.add(make_shared<sphere>(point3(4, 1, 0), 1.0, material3));
 
     camera cam;
-    cam.aspect_ratio = 16.0 / 9.0;
+    cam.aspect_ratio      = 16.0 / 9.0;
     cam.image_width       = 400;
     cam.samples_per_pixel = 100;
     cam.max_depth         = 50;
+    cam.background        = color(0.70, 0.80, 1.00);
 
     cam.vfov = 20;
     cam.lookfrom = point3(13, 2, 3);

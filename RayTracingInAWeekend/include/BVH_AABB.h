@@ -95,4 +95,12 @@ class bvh_aabb {
 const bvh_aabb bvh_aabb::empty    = bvh_aabb(interval::empty,    interval::empty,    interval::empty);
 const bvh_aabb bvh_aabb::universe = bvh_aabb(interval::universe, interval::universe, interval::universe);
 
+bvh_aabb operator+(const bvh_aabb& bbox, const vec3& offset) {
+    return bvh_aabb(bbox.x + offset.x(), bbox.y + offset.y(), bbox.z + offset.z());
+}
+
+bvh_aabb operator+(const vec3& offset, const bvh_aabb& bbox) {
+    return bbox + offset;
+}
+
 #endif // BVH_AABB_H

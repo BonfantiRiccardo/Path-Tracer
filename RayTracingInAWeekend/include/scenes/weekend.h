@@ -59,6 +59,7 @@ inline camera build_weekend_scene(hittable_list &world) {
     cam.image_width = 1200;
     cam.samples_per_pixel = 20;
     cam.max_depth = 10;
+    cam.background        = color(0.70, 0.80, 1.00);
 
     cam.vfov = 20;
     cam.lookfrom = point3(13, 2, 3);
