@@ -16,8 +16,8 @@ class quad : public planar_primitive {
 
     void set_bounding_box() override {
         // Compute the bounding box of all four vertices.
-        auto bbox_diagonal1 = bvh_aabb(Q, Q + u + v);
-        auto bbox_diagonal2 = bvh_aabb(Q + u, Q + v);
+        bvh_aabb bbox_diagonal1 = bvh_aabb(Q, Q + u + v);
+        bvh_aabb bbox_diagonal2 = bvh_aabb(Q + u, Q + v);
         bbox = bvh_aabb(bbox_diagonal1, bbox_diagonal2);
     }
 

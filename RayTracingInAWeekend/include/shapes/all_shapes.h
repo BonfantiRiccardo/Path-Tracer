@@ -6,3 +6,6 @@
 #include "2D/plane.h"
 #include "2D/quad.h"
 #include "2D/triangle.h"
+#include "2D/disk.h"
+#include "2D/ellipse.h"
+#include "2D/annulus.h"

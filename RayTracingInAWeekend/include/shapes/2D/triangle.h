@@ -1,8 +1,8 @@
 #ifndef TRIANGLE_H
 #define TRIANGLE_H
 
-#include "../raytracing.h"
-#include "../hittable.h"
+#include "../../raytracing.h"
+#include "../../hittable.h"
 #include "planar_primitive.h"
 
 /**
