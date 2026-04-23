@@ -8,3 +8,5 @@
 #include "perlin_spheres.h"
 #include "quads_scene.h"
 #include "light_scene.h"
+#include "cornell_smoke.h"
+#include "next_week.h"

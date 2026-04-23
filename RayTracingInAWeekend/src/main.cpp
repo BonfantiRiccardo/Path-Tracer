@@ -8,7 +8,7 @@ int main(int argc, char* argv[]) {
     hittable_list world;
     camera cam;
 
-    cam = cornell_box_scene(world);
+    cam = next_week(world, 800, 10000, 40);
 
     std::filesystem::path output_image = std::filesystem::path("out") / "image.ppm";
     if (argc > 0) {

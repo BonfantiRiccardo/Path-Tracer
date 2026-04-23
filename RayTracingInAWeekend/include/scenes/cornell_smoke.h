@@ -1,9 +1,10 @@
-#ifndef CORNELL_BOX_H
-#define CORNELL_BOX_H
+#ifndef CORNELL_SMOKE_H
+#define CORNELL_SMOKE_H
 
 #include "scene_headers.h"
+#include "../constant_medium.h"
 
-inline camera cornell_box_scene(hittable_list& world) {
+inline camera cornell_smoke(hittable_list& world) {
 
     auto red   = make_shared<lambertian>(color(.65, .05, .05));     // Red diffuse material (right wall)
     auto white = make_shared<lambertian>(color(.73, .73, .73));     // White diffuse material (floor, ceiling, back wall)
@@ -20,13 +21,13 @@ inline camera cornell_box_scene(hittable_list& world) {
     shared_ptr<hittable> box1 = make_shared<aabb>(point3(0, 0, 0), point3(165, 330, 165), white);
     box1 = make_shared<rotate_y>(box1, 15);
     box1 = make_shared<translate>(box1, vec3(265, 0, 295));
-    world.add(box1);
 
     shared_ptr<hittable> box2 = make_shared<aabb>(point3(0, 0, 0), point3(165, 165, 165), white);
     box2 = make_shared<rotate_y>(box2, -18);
     box2 = make_shared<translate>(box2, vec3(130, 0, 65));
-    world.add(box2);
 
+    world.add(make_shared<constant_medium>(box1, 0.01, color(0,0,0)));
+    world.add(make_shared<constant_medium>(box2, 0.01, color(1,1,1)));
 
     camera cam;
 
@@ -46,4 +47,4 @@ inline camera cornell_box_scene(hittable_list& world) {
     return cam;
 }
 
-#endif // CORNELL_BOX_H
+#endif // CORNELL_SMOKE_H
