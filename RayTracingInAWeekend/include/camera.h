@@ -8,6 +8,9 @@
 #include <fstream>
 #include <filesystem>
 #include <vector>
+#include <thread>
+#include <atomic>
+#include <chrono>
 
 class camera
 {
@@ -37,28 +40,100 @@ public:
         if (!output_dir.empty()) {
             std::filesystem::create_directories(output_dir);
         }
+
+        // Create a framebuffer to hold the pixel colors
+        std::vector<color> framebuffer(
+            static_cast<size_t>(image_width) * static_cast<size_t>(image_height)
+        );
+
+        // Determine the number of hardware threads available
+        const unsigned hw_threads = std::thread::hardware_concurrency();
+        const unsigned num_threads = (hw_threads == 0) ? 1u : hw_threads;
+        std::atomic<int> next_row{0};       // Atomic counter to assign rows to threads
+        std::atomic<int> rows_done{0};     // Atomic counter to track completed rows for progress reporting
+
+        // Lambda function for worker threads to render assigned rows of the image
+        auto worker = [&]() {
+            while (true) {  // Loop until all rows are processed
+                const int j = next_row.fetch_add(1, std::memory_order_relaxed);  // Get the next row index
+                if (j >= image_height)
+                    break;  // No more rows to process
+
+                // Render the assigned row of pixels (same code as original single-threaded loop)
+                for (int i = 0; i < image_width; i++) {
+                    color pixel_color(0,0,0);
+                    for (int sample = 0; sample < samples_per_pixel; sample++) {
+                        ray r = get_ray(i, j);
+                        pixel_color += ray_color(r, max_depth, world);
+                    }
+
+                    // Update the framebuffer with the computed pixel color, applying samples scale factor
+                    framebuffer[
+                        static_cast<size_t>(j) * static_cast<size_t>(image_width) + static_cast<size_t>(i)
+                    ] = pixel_samples_scale * pixel_color;
+                }
+
+                // Update progress after completing the row
+                rows_done.fetch_add(1, std::memory_order_relaxed);
+            }
+        };
+
+        // Lambda function to log rendering progress to the console
+        auto progress_logger = [&]() {
+            int last_done = -1;     // Init counter to track last logged progress
+            while (true) {
+                // Read the current atomic count of completed rows
+                const int done = rows_done.load(std::memory_order_relaxed);
+
+                if (done != last_done) {
+                    // Log progress to console (overwrite previous line)
+                    std::clog << "\rScanlines remaining: " << (image_height - done) << ' ' << std::flush;
+                    last_done = done;
+                }
+
+                // Exit the loop when all rows are done
+                if (done >= image_height)
+                    break;
+
+                // Sleep briefly to avoid excessive CPU usage while waiting for progress updates
+                std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            }
+        };
+
+        // Start the progress logger thread
+        std::thread progress_thread(progress_logger);
+
+
+        // Create worker threads vector and launch the worker function we just defined in each thread
+        std::vector<std::thread> workers;
+        workers.reserve(num_threads);
+        for (unsigned t = 0; t < num_threads; t++) {
+            workers.emplace_back(worker);  // Start worker threads, emplace_back creates (in-place) a new element at the end of the vector
+        }
+        for (auto& w : workers) {
+            w.join();  // Wait for all worker threads to finish
+        }
+
+        progress_thread.join();  // Wait for the progress logger thread to finish
+
+        std::clog << "\rAll scanlines completed. Writing output file... \n" << std::flush;
+
+        // When each thread is done, open the output file for writing
         std::ofstream out_file(output_file_path);
-        if (!out_file)
-        {
+        if (!out_file) {
             std::cerr << "Could not open output file: " << output_file_path << "\n";
             return;
         }
 
-        // Render loop
-        out_file << "P3\n"
-                 << image_width << " " << image_height << "\n255\n";
+        // Final render loop
+        out_file << "P3\n" << image_width << " " << image_height << "\n255\n";
 
-        for (int j = 0; j < image_height; j++)
-        {
-            std::clog << "\rScanlines remaining: " << (image_height - j) << ' ' << std::flush;
-            for (int i = 0; i < image_width; i++)
-            {
-                color pixel_color(0,0,0);
-                for (int sample = 0; sample < samples_per_pixel; sample++) {
-                    ray r = get_ray(i, j);
-                    pixel_color += ray_color(r, max_depth, world);
-                }
-                write_color(out_file, pixel_samples_scale * pixel_color);
+        for (int j = 0; j < image_height; j++) {
+            for (int i = 0; i < image_width; i++) {
+                // Simply write the color of the framebuffer to the file
+                write_color(out_file, 
+                            framebuffer[static_cast<size_t>(j) * static_cast<size_t>(image_width) + static_cast<size_t>(i)]
+                        );
             }
         }
 

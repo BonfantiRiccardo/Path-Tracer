@@ -29,15 +29,35 @@ if %ERRORLEVEL% NEQ 0 (
     exit /b 1
 )
 
+set "BUILD_MODE=Debug"
+if not "%~1"=="" (
+    if /I "%~1"=="Debug" (
+        set "BUILD_MODE=Debug"
+    ) else if /I "%~1"=="Release" (
+        set "BUILD_MODE=Release"
+    ) else (
+        echo Invalid build mode: "%~1"
+        echo Usage: build.bat [Debug^|Release]
+        popd >nul
+        exit /b 1
+    )
+)
+
 echo.
-echo Compiling...
+echo Compiling (%BUILD_MODE%)...
 if not exist "%ROOT%out" mkdir "%ROOT%out"
 
-cl.exe /Zi /EHsc /nologo /std:c++17 /I"%ROOT%include" /Fe:"%ROOT%out\main.exe" "%ROOT%src\main.cpp"
-if %ERRORLEVEL% EQU 0 (
-    echo Build successful!
+if /I "%BUILD_MODE%"=="Release" (
+    cl.exe /O2 /Ot /GL /Gy /DNDEBUG /EHsc /nologo /std:c++17 /I"%ROOT%include" /Fe:"%ROOT%out\main.exe" "%ROOT%src\main.cpp" /link /LTCG
 ) else (
-    echo Build failed with error code %ERRORLEVEL%
+    cl.exe /Zi /EHsc /nologo /std:c++17 /I"%ROOT%include" /Fe:"%ROOT%out\main.exe" "%ROOT%src\main.cpp"
+)
+set "CL_EXIT=%ERRORLEVEL%"
+if "%CL_EXIT%"=="0" (
+    echo Build successful! %BUILD_MODE%
+) else (
+    echo Build failed %BUILD_MODE% with error code %CL_EXIT%
 )
 
 popd >nul
+exit /b %CL_EXIT%
