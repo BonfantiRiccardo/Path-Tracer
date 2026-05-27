@@ -22,7 +22,7 @@ if not defined VCVARS_BAT (
     exit /b 1
 )
 
-call "%VCVARS_BAT%"
+call "%VCVARS_BAT%" >nul 2>&1
 if %ERRORLEVEL% NEQ 0 (
     echo Build failed while initializing Visual Studio environment.
     popd >nul
@@ -37,27 +37,51 @@ if not "%~1"=="" (
         set "BUILD_MODE=Release"
     ) else (
         echo Invalid build mode: "%~1"
-        echo Usage: build.bat [Debug^|Release]
+        echo Usage: build.bat [Debug^|Release] [source_file]
         popd >nul
         exit /b 1
     )
 )
 
-echo.
-echo Compiling (%BUILD_MODE%)...
+set "SOURCE_FILE=%ROOT%src\main.cpp"
+if not "%~2"=="" set "SOURCE_FILE=%~2"
+
+if not exist "%SOURCE_FILE%" if exist "%ROOT%%SOURCE_FILE%" set "SOURCE_FILE=%ROOT%%SOURCE_FILE%"
+
+if not exist "%SOURCE_FILE%" (
+    echo Build failed: source file not found "%SOURCE_FILE%"
+    popd >nul
+    exit /b 1
+)
+
+for %%I in ("%SOURCE_FILE%") do set "SOURCE_EXT=%%~xI"
+if /I not "%SOURCE_EXT%"==".c" if /I not "%SOURCE_EXT%"==".cc" if /I not "%SOURCE_EXT%"==".cpp" if /I not "%SOURCE_EXT%"==".cxx" (
+    echo Build failed: unsupported source extension "%SOURCE_EXT%". Use .c, .cc, .cpp, or .cxx.
+    popd >nul
+    exit /b 1
+)
+
+for %%I in ("%SOURCE_FILE%") do set "TARGET_NAME=%%~nI"
+set "OUTPUT_EXE=%ROOT%out\%TARGET_NAME%.exe"
+set "BUILD_LOG=%TEMP%\rtw_build_%TARGET_NAME%_%RANDOM%.log"
+
+echo Compiling %TARGET_NAME%%SOURCE_EXT%...
 if not exist "%ROOT%out" mkdir "%ROOT%out"
 
 if /I "%BUILD_MODE%"=="Release" (
-    cl.exe /O2 /Ot /GL /Gy /DNDEBUG /EHsc /nologo /std:c++17 /I"%ROOT%include" /Fe:"%ROOT%out\main.exe" "%ROOT%src\main.cpp" /link /LTCG
+    cl.exe /O2 /Ot /GL /Gy /DNDEBUG /EHsc /nologo /std:c++17 /I"%ROOT%include" /Fe:"%OUTPUT_EXE%" "%SOURCE_FILE%" /link /LTCG >"%BUILD_LOG%" 2>&1
 ) else (
-    cl.exe /Zi /EHsc /nologo /std:c++17 /I"%ROOT%include" /Fe:"%ROOT%out\main.exe" "%ROOT%src\main.cpp"
+    cl.exe /Zi /EHsc /nologo /std:c++17 /I"%ROOT%include" /Fe:"%OUTPUT_EXE%" "%SOURCE_FILE%" >"%BUILD_LOG%" 2>&1
 )
 set "CL_EXIT=%ERRORLEVEL%"
 if "%CL_EXIT%"=="0" (
     echo Build successful! %BUILD_MODE%
 ) else (
+    if exist "%BUILD_LOG%" type "%BUILD_LOG%"
     echo Build failed %BUILD_MODE% with error code %CL_EXIT%
 )
+
+if exist "%BUILD_LOG%" del /q "%BUILD_LOG%" >nul 2>&1
 
 popd >nul
 exit /b %CL_EXIT%

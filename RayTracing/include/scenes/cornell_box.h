@@ -3,7 +3,7 @@
 
 #include "scene_headers.h"
 
-inline camera cornell_box_scene(hittable_list& world) {
+inline camera cornell_box_scene(hittable_list& world, int image_width, int samples_per_pixel, int max_depth) {
 
     auto red   = make_shared<lambertian>(color(.65, .05, .05));     // Red diffuse material (right wall)
     auto white = make_shared<lambertian>(color(.73, .73, .73));     // White diffuse material (floor, ceiling, back wall)
@@ -31,9 +31,9 @@ inline camera cornell_box_scene(hittable_list& world) {
     camera cam;
 
     cam.aspect_ratio      = 1.0;
-    cam.image_width       = 600;
-    cam.samples_per_pixel = 200;
-    cam.max_depth         = 50;
+    cam.image_width       = image_width;
+    cam.samples_per_pixel = samples_per_pixel;
+    cam.max_depth         = max_depth;
     cam.background        = color(0,0,0);
 
     cam.vfov     = 40;

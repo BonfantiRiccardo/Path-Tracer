@@ -1,16 +1,18 @@
 # Path Tracer C++ Implementation
 
-![Path Tracer Render](docs/weekend.png)
+![Path Tracer Render](docs/next_week.png)
 
 
 This repository contains your path tracer implementation in two versions:
 
-1. `RayTracingInAWeekend`: CPU implementation following [Ray Tracing in One Weekend](https://raytracing.github.io/).
+1. `RayTracing`: CPU implementation following [Ray Tracing in One Weekend](https://raytracing.github.io/).
 2. `VulkanGPURT`: GPU implementation using a Vulkan compute shader (headless, no window/swapchain), writing the final image to a `.ppm` file.
 
 Both versions render the same style of path-traced scenes and produce image output files.
 
 ## Hardcoded scenes results
+![Weekend Scene](docs/weekend.png)
+- `weekend.png`: Render of the "weekend" scene with a variety of spheres and materials.
 ![Room Interior Scene](docs/room_interior.png)
 - `room_interior.png`: Render of the "room interior" scene with a Cornell box setup and a light source.
 ![Abstract Life Scene](docs/abstract_life.png)
@@ -21,28 +23,28 @@ Both versions render the same style of path-traced scenes and produce image outp
 
 ## Build And Run (CPU)
 
-Project folder: `RayTracingInAWeekend`
+Project folder: `RayTracing`
 
 Build:
 
 ```bat
-cd RayTracingInAWeekend
+cd RayTracing
 build.bat
 ```
 
 Binary output:
 
-- `RayTracingInAWeekend/out/main.exe`
+- `RayTracing/out/main.exe`
 
 Run:
 
 ```bat
-RayTracingInAWeekend\out\main.exe
+RayTracing\out\main.exe
 ```
 
 Output image:
 
-- `RayTracingInAWeekend/out/image.ppm`
+- `RayTracing/out/image.ppm`
 
 The CPU app builds the weekend scene with diffuse/metal/dielectric materials and renders it with the configured camera and sampling settings.
 
