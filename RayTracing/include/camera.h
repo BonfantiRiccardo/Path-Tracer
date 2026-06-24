@@ -269,7 +269,13 @@ private:
         if (!rec.mat->scatter(r, rec, attenuation, scattered))
             return color_from_emission;
 
-        color color_from_scatter = attenuation * ray_color(scattered, depth-1, world);
+        double scattering_pdf = rec.mat->scattering_pdf(r, rec, scattered);     //implement importance sampling
+        double pdf_value = scattering_pdf;
+
+        // Compute color taking into account the scattering PDF and the emitted color from the material
+        color color_from_scatter = (attenuation * scattering_pdf * ray_color(scattered, depth-1, world)) / pdf_value;
+
+        //color color_from_scatter = attenuation * ray_color(scattered, depth-1, world);
 
         return color_from_emission + color_from_scatter;
 

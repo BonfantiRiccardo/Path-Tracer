@@ -3,20 +3,35 @@
 #include <iostream>
 #include <iomanip>
 
+
+double icd(double d) {
+    return 8.0 * std::pow(d, 1.0/3.0);
+}
+
+double pdf(double x) {
+    return (3.0/8.0) * x*x;
+}
+
 int main() {
-    int a = 0;
-    int b = 2;
-    int N = 1000000;
+    int N = 1;
     auto sum = 0.0;
 
     for (int i = 0; i < N; i++) {
-        auto x = random_double(a, b);
-        //sum += x*x;
+        auto z = random_double();
+        if (z == 0.0)  // Ignore zero to avoid NaNs
+            continue;
+
+        auto x = icd(z);
+        //auto x = random_double(a, b);
+
+        sum += x*x / pdf(x);  // Importance sampling
         //sum += std::pow(std::sin(x), 5.0);
-        sum += std::log(std::sin(x));           // Non trivial integration solved with area under curve method
+        //sum += std::log(std::sin(x));           // Non trivial integration solved with area under curve method
 
     }
 
     std::cout << std::fixed << std::setprecision(12);
-    std::cout << "I = " << (b - a) * (sum / N) << '\n';
+    //std::cout << "I = " << (b - a) * (sum / N) << '\n';
+    std::cout << "I = " << (sum / N) << '\n';
+
 }
