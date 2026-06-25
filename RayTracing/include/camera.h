@@ -262,31 +262,32 @@ private:
         if (!world.hit(r, interval(0.001, infinity), rec))
             return background;
 
-        ray scattered;
-        color attenuation;
-        double pdfValue;
+        scatter_record srec;
         color color_from_emission = rec.mat->emitted(r, rec, rec.u, rec.v, rec.p);
 
-        if (!rec.mat->scatter(r, rec, attenuation, scattered, pdfValue))
+        if (!rec.mat->scatter(r, rec, srec))
             return color_from_emission;
 
-        // Create a mixture PDF that combines the light sampling PDF and the cosine-weighted PDF for the surface normal
-        auto p0 = make_shared<hittable_pdf>(lights, rec.p);
-        auto p1 = make_shared<cosine_pdf>(rec.normal);
-        mixture_pdf mixed_pdf(p0, p1);
+        if (srec.skip_pdf)
+            return srec.attenuation * ray_color(srec.skip_pdf_ray, depth-1, world, lights);
+        
 
-        scattered = ray(rec.p, mixed_pdf.generate(), r.time());
-        pdfValue = mixed_pdf.value(scattered.direction());
+        // Create a mixture PDF that combines the light sampling PDF and the material's scattering PDF
+        auto light_ptr = make_shared<hittable_pdf>(lights, rec.p);
+        mixture_pdf p(light_ptr, srec.pdf_ptr);
 
-        if (pdfValue <= 0 || !std::isfinite(pdfValue))
+        ray scattered = ray(rec.p, p.generate(), r.time());
+        auto pdf_value = p.value(scattered.direction());
+
+        if (pdf_value <= 0 || !std::isfinite(pdf_value))
             return color_from_emission;
 
         double scattering_pdf = rec.mat->scattering_pdf(r, rec, scattered);
 
         // Compute color taking into account the scattering PDF and the emitted color from the material
         color sample_color = ray_color(scattered, depth-1, world, lights);
-        color color_from_scatter = (attenuation * scattering_pdf * sample_color) / pdfValue;
-        //color color_from_scatter = attenuation * ray_color(scattered, depth-1, world);
+        color color_from_scatter = (srec.attenuation * scattering_pdf * sample_color) / pdf_value;
+        //color color_from_scatter = srec.attenuation * ray_color(scattered, depth-1, world);
 
         return color_from_emission + color_from_scatter;
 

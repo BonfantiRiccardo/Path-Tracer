@@ -19,8 +19,6 @@ class pdf {
     virtual vec3 generate() const = 0;
 };
 
-#endif // PDF_H
-
 /** 
  * PDF for sampling directions uniformly on a sphere.
  */
@@ -103,3 +101,5 @@ class mixture_pdf : public pdf {
   private:
     shared_ptr<pdf> p[2];
 };
+
+#endif // PDF_H
