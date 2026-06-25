@@ -42,6 +42,28 @@ class hittable_list : public hittable {
 
     bvh_aabb bounding_box() const override { return bbox; }
 
+    bool empty() const { return objects.empty(); }
+
+    double pdf_value(const point3& origin, const vec3& direction) const override {
+        if (objects.empty())
+            return 0;
+
+        auto weight = 1.0 / objects.size();
+        auto sum = 0.0;
+
+        for (const auto& object : objects)
+            sum += weight * object->pdf_value(origin, direction);
+
+        return sum;
+    }
+
+    vec3 random(const point3& origin) const override {
+        if (objects.empty())
+            return vec3(1, 0, 0);
+
+        return objects[random_int(0, int(objects.size()) - 1)]->random(origin);
+    }
+
     private:
         bvh_aabb bbox; // Bounding box for the entire list, used for BVH construction
 };

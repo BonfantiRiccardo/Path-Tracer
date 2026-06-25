@@ -48,6 +48,12 @@ class hittable {
 
     // Return the axis-aligned bounding box of the primitive for BVH construction.
     virtual bvh_aabb bounding_box() const = 0;
+
+    // Return the probability density function value for sampling a given direction from a point.
+    virtual double pdf_value(const point3& origin, const vec3& direction) const { return 0.0; }
+
+    // Generate a random direction from a point towards the surface of the primitive.
+    virtual vec3 random(const point3& origin) const { return vec3(1,0,0); }
 };
 
 // A hittable that translates another hittable by a given offset

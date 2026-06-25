@@ -8,11 +8,13 @@
 class planar_primitive : public hittable {
     public:
         planar_primitive(const point3& Q, const vec3& u, const vec3& v, shared_ptr<material> mat) : Q(Q), u(u), v(v), mat(mat) {
-            auto n = cross(u, v);           // Compute normal to the quad
+            n = cross(u, v);                // Compute normal to the quad
             normal = unit_vector(n);
             D = dot(normal, Q);             // Compute costant term D = N · P0 for the plane equation
 
             w = n / dot(n,n);               // Precompute w = N / (N · N) for efficient hit testing (used to get hit planar coordinates)
+
+            surface_area = 0.0;             // Area will be computed in derived classes
         }
 
         /**
@@ -54,7 +56,7 @@ class planar_primitive : public hittable {
         bvh_aabb bounding_box() const override { return bbox; }
 
         shared_ptr<material> get_material() const override { return mat; }
-        double area() const override { return 0.0; }
+        double area() const override { return surface_area; }
         bool sample_surface(point3 &p, vec3 &normal, double &pdf) const override { return false; }
 
     protected:
@@ -63,11 +65,12 @@ class planar_primitive : public hittable {
 
         point3 Q;
         vec3 u, v; // Not to be confused with texture coordinates, they are edge vectors defining the quad
-        vec3 w;    // Precomputed value w = N / (N · N) for efficient hit testing
+        vec3 n, w;    // Precomputed vectors for hit testing: n = u × v, w = n / (n · n) 
         shared_ptr<material> mat;
         bvh_aabb bbox;
         vec3 normal;
         double D; // Plane equation constant term
+        double surface_area;
 };
 
 

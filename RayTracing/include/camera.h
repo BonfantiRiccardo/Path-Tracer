@@ -4,6 +4,7 @@
 #include "hittable.h"
 #include "material.h"
 #include "hittable_list.h"
+#include "pdf.h"
 
 #include <fstream>
 #include <filesystem>
@@ -31,8 +32,7 @@ public:
     double focus_dist = 10;    // Distance from camera lookfrom point to plane of perfect focus
 
 
-
-    void render(const hittable &world, const std::filesystem::path& output_file_path = std::filesystem::path("out") / "image.ppm") {
+    void render(const hittable &world, const hittable &lights, const std::filesystem::path& output_file_path = std::filesystem::path("out") / "image.ppm") {
         initialize();
 
         // Ensure output directory exists and open output file
@@ -67,7 +67,7 @@ public:
                     for (int s_j = 0; s_j < sqrt_spp; s_j++) {
                       for (int s_i = 0; s_i < sqrt_spp; s_i++) {
                         ray r = get_ray(i, j, s_i, s_j);
-                        pixel_color += ray_color(r, max_depth, world);
+                        pixel_color += ray_color(r, max_depth, world, lights);
                     }
                 }
                     // Update the framebuffer with the computed pixel color, applying samples scale factor
@@ -250,7 +250,7 @@ private:
     /**
      * Computes the color seen along a ray.
      */
-    color ray_color(const ray& r, int depth, const hittable& world) const {
+    color ray_color(const ray& r, int depth, const hittable& world, const hittable& lights) const {
         // If we've exceeded the ray bounce limit, no more light is gathered.
         if (depth <= 0)
             return color(0,0,0);
@@ -264,17 +264,28 @@ private:
 
         ray scattered;
         color attenuation;
-        color color_from_emission = rec.mat->emitted(rec.u, rec.v, rec.p);
+        double pdfValue;
+        color color_from_emission = rec.mat->emitted(r, rec, rec.u, rec.v, rec.p);
 
-        if (!rec.mat->scatter(r, rec, attenuation, scattered))
+        if (!rec.mat->scatter(r, rec, attenuation, scattered, pdfValue))
             return color_from_emission;
 
-        double scattering_pdf = rec.mat->scattering_pdf(r, rec, scattered);     //implement importance sampling
-        double pdf_value = scattering_pdf;
+        // Create a mixture PDF that combines the light sampling PDF and the cosine-weighted PDF for the surface normal
+        auto p0 = make_shared<hittable_pdf>(lights, rec.p);
+        auto p1 = make_shared<cosine_pdf>(rec.normal);
+        mixture_pdf mixed_pdf(p0, p1);
+
+        scattered = ray(rec.p, mixed_pdf.generate(), r.time());
+        pdfValue = mixed_pdf.value(scattered.direction());
+
+        if (pdfValue <= 0 || !std::isfinite(pdfValue))
+            return color_from_emission;
+
+        double scattering_pdf = rec.mat->scattering_pdf(r, rec, scattered);
 
         // Compute color taking into account the scattering PDF and the emitted color from the material
-        color color_from_scatter = (attenuation * scattering_pdf * ray_color(scattered, depth-1, world)) / pdf_value;
-
+        color sample_color = ray_color(scattered, depth-1, world, lights);
+        color color_from_scatter = (attenuation * scattering_pdf * sample_color) / pdfValue;
         //color color_from_scatter = attenuation * ray_color(scattered, depth-1, world);
 
         return color_from_emission + color_from_scatter;

@@ -5,10 +5,7 @@
 
 
 int main(int argc, char* argv[]) {
-    hittable_list world;
-    camera cam;
-
-    cam = cornell_box_scene(world, 600, 1000, 100);
+    scene current_scene = cornell_box_scene(600, 1000, 100);
 
     std::filesystem::path output_image = std::filesystem::path("out") / "image.ppm";
     if (argc > 0) {
@@ -18,9 +15,9 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    world = hittable_list(make_shared<bvh_node>(world));
+    current_scene.world = hittable_list(make_shared<bvh_node>(current_scene.world));
 
-    cam.render(world, output_image);
+    current_scene.cam.render(current_scene.world, current_scene.lights, output_image);
 
     return 0;
 }

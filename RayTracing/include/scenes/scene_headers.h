@@ -3,3 +3,4 @@
 #include "../hittable_list.h"
 #include "../shapes/all_shapes.h"
 #include "../material.h"
+#include "scene.h"
