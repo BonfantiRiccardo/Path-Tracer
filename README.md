@@ -27,24 +27,34 @@ Project folder: `RayTracing`
 
 Build:
 
-```bat
-cd RayTracing
-build.bat
+```bash
+cmake -S RayTracing -B RayTracing/build
+cmake --build RayTracing/build --config Release
 ```
 
 Binary output:
 
-- `RayTracing/out/main.exe`
+- `RayTracing/build/out/<config>/main` or `main.exe` depending on platform and generator
+
+The CMake build also produces the small demo executables from `RayTracing/src/`:
+
+- `cos_cubed`
+- `cos_density`
+- `estimate_halfway`
+- `importance_sphere`
+- `integrate_x_sq`
+- `pi`
+- `sphere_plot`
 
 Run:
 
-```bat
-RayTracing\out\main.exe
+```bash
+RayTracing/build/out/Release/main.exe
 ```
 
 Output image:
 
-- `RayTracing/out/image.ppm`
+- `RayTracing/build/out/<config>/image.ppm`
 
 The CPU app builds the weekend scene with diffuse/metal/dielectric materials and renders it with the configured camera and sampling settings.
 
