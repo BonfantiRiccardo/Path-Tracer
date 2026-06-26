@@ -6,7 +6,9 @@
 #include "../constant_medium.h"
 
 
-inline camera next_week(hittable_list& world, int image_width, int samples_per_pixel, int max_depth) {
+inline scene next_week(int image_width, int samples_per_pixel, int max_depth) {
+    scene result;
+    auto& world = result.world;
     hittable_list boxes1;
     auto ground = make_shared<lambertian>(color(0.48, 0.83, 0.53));
 
@@ -29,7 +31,9 @@ inline camera next_week(hittable_list& world, int image_width, int samples_per_p
     world.add(make_shared<bvh_node>(boxes1));
 
     auto light = make_shared<diffuse_light>(color(7, 7, 7));
-    world.add(make_shared<quad>(point3(123,554,147), vec3(300,0,0), vec3(0,0,265), light));
+    auto ceiling_light = make_shared<quad>(point3(123,554,147), vec3(300,0,0), vec3(0,0,265), light);
+    world.add(ceiling_light);
+    result.lights.add(ceiling_light);
 
     auto center1 = point3(400, 400, 200);
     auto center2 = center1 + vec3(30,0,0);
@@ -66,22 +70,20 @@ inline camera next_week(hittable_list& world, int image_width, int samples_per_p
         )
     );
 
-    camera cam;
+    result.cam.aspect_ratio      = 1.0;
+    result.cam.image_width       = image_width;
+    result.cam.samples_per_pixel = samples_per_pixel;
+    result.cam.max_depth         = max_depth;
+    result.cam.background        = color(0,0,0);
 
-    cam.aspect_ratio      = 1.0;
-    cam.image_width       = image_width;
-    cam.samples_per_pixel = samples_per_pixel;
-    cam.max_depth         = max_depth;
-    cam.background        = color(0,0,0);
+    result.cam.vfov     = 40;
+    result.cam.lookfrom = point3(478, 278, -600);
+    result.cam.lookat   = point3(278, 278, 0);
+    result.cam.viewup   = vec3(0,1,0);
 
-    cam.vfov     = 40;
-    cam.lookfrom = point3(478, 278, -600);
-    cam.lookat   = point3(278, 278, 0);
-    cam.viewup   = vec3(0,1,0);
+    result.cam.defocus_angle = 0;
 
-    cam.defocus_angle = 0;
-
-    return cam;
+    return result;
 }
 
 #endif // NEXT_WEEK_H

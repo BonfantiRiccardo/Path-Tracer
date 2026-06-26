@@ -3,7 +3,9 @@
 
 #include "scene_headers.h"
 
-inline camera build_bouncing_spheres_scene(hittable_list &world) {
+inline scene build_bouncing_spheres_scene() {
+    scene result;
+    auto& world = result.world;
     // Create a ground object that renders a checkered texture
     auto checker = make_shared<checker_texture>(0.32, color(.2, .3, .1), color(.9, .9, .9));
     world.add(make_shared<sphere>(point3(0,-1000,0), 1000, make_shared<lambertian>(checker)));
@@ -54,22 +56,21 @@ inline camera build_bouncing_spheres_scene(hittable_list &world) {
     auto material3 = make_shared<metal>(color(0.7, 0.6, 0.5), 0.0);
     world.add(make_shared<sphere>(point3(4, 1, 0), 1.0, material3));
 
-    camera cam;
-    cam.aspect_ratio      = 16.0 / 9.0;
-    cam.image_width       = 400;
-    cam.samples_per_pixel = 100;
-    cam.max_depth         = 50;
-    cam.background        = color(0.70, 0.80, 1.00);
+    result.cam.aspect_ratio      = 16.0 / 9.0;
+    result.cam.image_width       = 400;
+    result.cam.samples_per_pixel = 100;
+    result.cam.max_depth         = 50;
+    result.cam.background        = color(0.70, 0.80, 1.00);
 
-    cam.vfov = 20;
-    cam.lookfrom = point3(13, 2, 3);
-    cam.lookat = point3(0, 0, 0);
-    cam.viewup = vec3(0, 1, 0);
+    result.cam.vfov = 20;
+    result.cam.lookfrom = point3(13, 2, 3);
+    result.cam.lookat = point3(0, 0, 0);
+    result.cam.viewup = vec3(0, 1, 0);
 
-    cam.defocus_angle = 0.6;
-    cam.focus_dist = 10.0;
+    result.cam.defocus_angle = 0.6;
+    result.cam.focus_dist = 10.0;
 
-    return cam;
+    return result;
 }
 
 #endif // SCENE_BOUNCING_SPHERES_H

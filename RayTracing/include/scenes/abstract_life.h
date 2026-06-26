@@ -3,7 +3,9 @@
 
 #include "scene_headers.h"
 
-inline camera build_abstract_life_scene(hittable_list& world) {
+inline scene build_abstract_life_scene() {
+    scene result;
+    auto& world = result.world;
     auto ground = make_shared<lambertian>(color(0.12, 0.12, 0.16));
     auto wall = make_shared<lambertian>(color(0.72, 0.86, 1.00));
 
@@ -51,21 +53,20 @@ inline camera build_abstract_life_scene(hittable_list& world) {
     world.add(make_shared<triangle>(point3(1.5, 0.0, 0.5), vec3(0.8, 0.0, 0.0), vec3(1.5, 0.8, -0.2), vividYellow));
     world.add(make_shared<triangle>(point3(1.5, 0.0, 1.0), vec3(2.2, 0.0, 1.2), vec3(1.5, 0.6, 0.5), vividMagenta));
 
-    camera cam;
-    cam.aspect_ratio      = 16.0 / 9.0;
-    cam.image_width       = 1200;
-    cam.samples_per_pixel = 100;
-    cam.max_depth         = 10;
-    cam.background        = color(0.70, 0.80, 1.00);
+    result.cam.aspect_ratio      = 16.0 / 9.0;
+    result.cam.image_width       = 1200;
+    result.cam.samples_per_pixel = 100;
+    result.cam.max_depth         = 10;
+    result.cam.background        = color(0.70, 0.80, 1.00);
 
-    cam.vfov     = 40;
-    cam.lookfrom = point3(0.0, 3.5, 8.0);
-    cam.lookat   = point3(0.5, 0.8, 0.0);
-    cam.viewup   = vec3(0, 1, 0);
+    result.cam.vfov     = 40;
+    result.cam.lookfrom = point3(0.0, 3.5, 8.0);
+    result.cam.lookat   = point3(0.5, 0.8, 0.0);
+    result.cam.viewup   = vec3(0, 1, 0);
 
-    cam.defocus_angle = 0.02;
-    cam.focus_dist    = 8.5;
-    return cam;
+    result.cam.defocus_angle = 0.02;
+    result.cam.focus_dist    = 8.5;
+    return result;
 }
 
 #endif // ABSTRACT_LIFE_H

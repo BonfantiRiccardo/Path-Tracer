@@ -5,7 +5,7 @@
 
 
 int main(int argc, char* argv[]) {
-    scene current_scene = cornell_box_scene(600, 1000, 100);
+    scene current_scene = next_week(800, 1000, 100);
 
     std::filesystem::path output_image = std::filesystem::path("out") / "image.ppm";
     if (argc > 0) {

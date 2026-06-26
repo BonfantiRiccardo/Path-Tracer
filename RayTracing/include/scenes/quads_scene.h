@@ -3,7 +3,9 @@
 
 #include "scene_headers.h"
 
-inline camera quads_scene(hittable_list &world) {
+inline scene quads_scene() {
+    scene result;
+    auto& world = result.world;
     
     // Materials
     auto left_red     = make_shared<lambertian>(color(1.0, 0.2, 0.2));
@@ -19,22 +21,20 @@ inline camera quads_scene(hittable_list &world) {
     world.add(make_shared<annulus>(point3(0, 3, 3), vec3(0, 1, 0), 1.5, 2.0, upper_orange));
     world.add(make_shared<triangle>(point3(-2, -3, 5), vec3(4, 0, 0), vec3(0, 0,-4), lower_teal));
 
-    camera cam;
+    result.cam.aspect_ratio      = 1.0;
+    result.cam.image_width       = 400;
+    result.cam.samples_per_pixel = 100;
+    result.cam.max_depth         = 50;
+    result.cam.background        = color(0.70, 0.80, 1.00);
 
-    cam.aspect_ratio      = 1.0;
-    cam.image_width       = 400;
-    cam.samples_per_pixel = 100;
-    cam.max_depth         = 50;
-    cam.background        = color(0.70, 0.80, 1.00);
+    result.cam.vfov     = 80;
+    result.cam.lookfrom = point3(0,0,9);
+    result.cam.lookat   = point3(0,0,0);
+    result.cam.viewup   = vec3(0,1,0);
 
-    cam.vfov     = 80;
-    cam.lookfrom = point3(0,0,9);
-    cam.lookat   = point3(0,0,0);
-    cam.viewup   = vec3(0,1,0);
+    result.cam.defocus_angle = 0;
 
-    cam.defocus_angle = 0;
-
-    return cam;
+    return result;
 }
 
 #endif // QUADS_SCENE_H

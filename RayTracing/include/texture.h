@@ -82,6 +82,23 @@ class image_texture : public texture {
     rtw_image image;
 };
 
+class uv_scale_texture : public texture {
+  public:
+    uv_scale_texture(shared_ptr<texture> tex, double u_scale, double v_scale)
+      : tex(tex), u_scale(u_scale), v_scale(v_scale) {}
+
+    color value(double u, double v, const point3& p) const override {
+        u = u * u_scale - std::floor(u * u_scale);
+        v = v * v_scale - std::floor(v * v_scale);
+        return tex->value(u, v, p);
+    }
+
+  private:
+    shared_ptr<texture> tex;
+    double u_scale;
+    double v_scale;
+};
+
 /**
  * Noise texture that generates a procedural noise pattern based on Perlin noise
  * The value of the texture at a given point is determined by the noise function, the result is a grayscale texture that 
