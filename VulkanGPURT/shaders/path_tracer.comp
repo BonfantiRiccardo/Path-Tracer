@@ -17,7 +17,8 @@ layout(std430, binding = 0) readonly buffer SceneBuffer {
     Sphere spheres[];
 } sceneBuffer;
 
-layout(std430, binding = 1) writeonly buffer OutputBuffer {
+// Read-write: each dispatch accumulates its sample batch into the running total (see main()).
+layout(std430, binding = 1) buffer OutputBuffer {
     vec4 pixels[];
 } outputBuffer;
 
@@ -38,6 +39,7 @@ layout(push_constant) uniform PushConstants {
     uint samplesPerPixel;
     uint maxBounces;
     uint seed;
+    uint sampleOffset;
 } pc;
 
 #include "path_tracer_lib.glsl"
@@ -49,9 +51,10 @@ void main() {
         return;
     }
 
-    // Calculate a unique seed for the random number generator based on the pixel index and a global seed
+    // Calculate a unique seed for the random number generator based on the pixel index and a global seed.
+    // Folding in sampleOffset gives each sample batch an independent RNG sequence, so batches don't repeat samples.
     uint index = pixel.y * pc.width + pixel.x;
-    uint seed = index * 9781u + pc.seed * 6271u;
+    uint seed = index * 9781u + (pc.seed + pc.sampleOffset) * 6271u;
 
     vec3 sampleColor = vec3(0.0);   // Accumulate color samples for anti-aliasing and noise reduction
 
@@ -60,6 +63,8 @@ void main() {
         sampleColor += rayColor(ray, seed);         // Trace the ray through the scene and accumulate its color
     }
 
-    sampleColor /= max(float(pc.samplesPerPixel), 1.0);         // Average the accumulated color samples to get the final color for the pixel
-    outputBuffer.pixels[index] = vec4(sampleColor, 1.0);        // Write the final color to the output buffer
+    // Accumulate this batch's summed radiance and its sample count into the running total. The render is
+    // split across several dispatches to stay under the GPU watchdog timeout; the host divides the final
+    // sum by the accumulated count (stored in .a) when tonemapping.
+    outputBuffer.pixels[index] += vec4(sampleColor, float(pc.samplesPerPixel));
 }

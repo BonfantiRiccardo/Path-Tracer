@@ -16,9 +16,10 @@ struct PushConstants {
     uint32_t width;
     uint32_t height;
     uint32_t sphereCount;
-    uint32_t samplesPerPixel;
+    uint32_t samplesPerPixel;  // Number of samples traced in THIS dispatch (one sample batch), not the total.
     uint32_t maxBounces;
     uint32_t seed;
+    uint32_t sampleOffset;     // Samples already accumulated before this batch; decorrelates each batch's RNG.
 };
 
 static_assert(sizeof(PushConstants) % 4 == 0, "Push constants must be 4-byte aligned.");

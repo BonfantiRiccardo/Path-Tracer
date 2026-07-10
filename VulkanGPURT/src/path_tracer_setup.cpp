@@ -388,10 +388,15 @@ void PathTracer::Impl::createDescriptorSet() {
  * Resolves the path to the shader file.
  */
 std::filesystem::path PathTracer::Impl::resolveShaderPath() const {
+    // The renderer is expected to be launched from the repository root. CMake compiles and copies the
+    // SPIR-V binary next to the executable under VulkanGPURT/build/<config>/shaders/, so look there first.
+    const std::filesystem::path cwd = std::filesystem::current_path();
     const std::vector<std::filesystem::path> candidates = {
-        std::filesystem::current_path() / "shaders" / "path_tracer.comp.spv",
-        std::filesystem::current_path() / ".." / "shaders" / "path_tracer.comp.spv",
-        std::filesystem::current_path() / ".." / ".." / "shaders" / "path_tracer.comp.spv"
+        cwd / "VulkanGPURT" / "build" / "Release" / "shaders" / "path_tracer.comp.spv",
+        cwd / "VulkanGPURT" / "build" / "Debug" / "shaders" / "path_tracer.comp.spv",
+        cwd / "shaders" / "path_tracer.comp.spv",
+        cwd / ".." / "shaders" / "path_tracer.comp.spv",
+        cwd / ".." / ".." / "shaders" / "path_tracer.comp.spv"
     };
 
     for (const std::filesystem::path& candidate : candidates) {

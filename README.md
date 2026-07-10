@@ -87,26 +87,30 @@ The reusable scene helper is `mesh_scene(...)` in `RayTracing/include/scenes/mes
 
 Project folder: `VulkanGPURT`
 
-Build:
+Requires the Vulkan SDK installed and the `VULKAN_SDK` environment variable set (CMake uses it to find `glslc` for compiling the compute shader).
 
-```bat
-cd VulkanGPURT
-build.bat
+Build (run from the repository root):
+
+```bash
+cmake -S VulkanGPURT -B VulkanGPURT/build
+cmake --build VulkanGPURT/build --config Release
 ```
 
 Binary output:
 
-- `VulkanGPURT/out/vulkan_gpu_rt.exe`
+- `VulkanGPURT/build/<config>/vulkan_gpu_rt.exe` (e.g. `VulkanGPURT/build/Release/vulkan_gpu_rt.exe`)
 
-Shader output copied by the build script:
+Shader output compiled and copied next to the executable by the build:
 
-- `VulkanGPURT/out/shaders/path_tracer.comp.spv`
+- `VulkanGPURT/build/<config>/shaders/path_tracer.comp.spv`
 
-Run example:
+Run example (launch from the repository root so the shader is found):
 
 ```bat
-VulkanGPURT\out\vulkan_gpu_rt.exe --width 1200 --height 675 --spp 20 --bounces 10 --scene weekend --output image.ppm
+.\VulkanGPURT\build\Release\vulkan_gpu_rt.exe --width 1200 --height 675 --spp 20 --bounces 10 --scene weekend --output VulkanGPURT/out/image.ppm
 ```
+
+The renderer locates `path_tracer.comp.spv` relative to the current working directory, checking `VulkanGPURT/build/Release/shaders/` and `VulkanGPURT/build/Debug/shaders/`. Run it from the repository root (as shown above); if you run it from elsewhere, pass a working directory at the repo root or place a `shaders/path_tracer.comp.spv` alongside where you launch it.
 
 Supported arguments:
 

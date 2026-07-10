@@ -50,6 +50,8 @@ private:
     void updateDescriptorSet();
 
     void dispatch();
+    void zeroOutputBuffer();
+    void dispatchSampleBatch(uint32_t groupsX, uint32_t groupsY, uint32_t sampleOffset, uint32_t batchSamples);
     static uint8_t tonemapToByte(float linear);
     void writePpmImage();
     void cleanup();
