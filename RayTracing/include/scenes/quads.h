@@ -3,7 +3,7 @@
 
 #include "scene_headers.h"
 
-inline scene quads_scene() {
+inline scene quads_scene(int image_width, int samples_per_pixel, int max_depth) {
     scene result;
     auto& world = result.world;
     
@@ -22,9 +22,9 @@ inline scene quads_scene() {
     world.add(make_shared<triangle>(point3(-2, -3, 5), vec3(4, 0, 0), vec3(0, 0,-4), lower_teal));
 
     result.cam.aspect_ratio      = 1.0;
-    result.cam.image_width       = 400;
-    result.cam.samples_per_pixel = 100;
-    result.cam.max_depth         = 50;
+    result.cam.image_width       = image_width;         //400
+    result.cam.samples_per_pixel = samples_per_pixel;         //100
+    result.cam.max_depth         = max_depth;          //50
     result.cam.background        = color(0.70, 0.80, 1.00);
 
     result.cam.vfov     = 80;

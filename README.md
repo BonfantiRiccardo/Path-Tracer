@@ -17,8 +17,10 @@ Both versions render the same style of path-traced scenes and produce image outp
 - `room_interior.png`: Render of the "room interior" scene with a Cornell box setup and a light source.
 ![Abstract Life Scene](docs/abstract_life.png)
 - `abstract_life.png`: Render of the "abstract life" scene with a more artistic arrangement of objects and materials.
-![Cornell Box Scene](docs/cornell_box.png)
-- `cornell_box.png`: Render of the classic Cornell box scene with two boxes.
+![Cornell Box Scene](docs/final_cornell.png)
+- `cornell_box.png`: Render of the classic Cornell box scene with a box and a sphere.
+![Ferrari Scene](docs/ferrari.png)
+- `ferrari.png`: Render of a Ferrari 1987 model in a scene with a simple background and lighting.
 
 
 ## Build And Run (CPU)
@@ -46,17 +48,40 @@ The CMake build also produces the small demo executables from `RayTracing/src/`:
 - `pi`
 - `sphere_plot`
 
-Run:
+Run (the CPU app has a small CLI — pass `--help` to see it):
 
 ```bash
-RayTracing/build/out/Release/main.exe
+# default scene (cornell_box) at the default settings
+.\RayTracing\build\out\Release\main.exe
+
+# pick a built-in scene by its file name in include/scenes/, at a quick preview size
+.\RayTracing\build\out\Release\main.exe --scene ferrari_1987 --width 1200 --spp 1000 --depth 100
+
+
+
+# render a single mesh file (path tried as-given, then relative to models/)
+.\RayTracing\build\out\Release\main.exe --mesh 1987_ferrari_f40/scene.gltf
 ```
+
+Options:
+
+- `--scene <name>`: built-in scene, selected by its exact file name (default `cornell_box`). Run with `--help` for the full list.
+- `--mesh <path>`: render one `.obj`/`.gltf`/`.glb`; overrides `--scene`. The path is resolved relative to the working directory (or absolute), then relative to the `models/` folder.
+- `--width N`, `--spp N`, `--depth N`: image width, samples per pixel, and max ray bounces.
+- `-h`, `--help`: print usage and the list of scenes.
+
+The build mirrors the `models/` and `images/` asset folders next to the executable, so assets load regardless of the working directory.
 
 Output image:
 
 - `RayTracing/build/out/<config>/image.ppm`
 
-The CPU app builds the weekend scene with diffuse/metal/dielectric materials and renders it with the configured camera and sampling settings.
+Mesh import support is available through header-only loaders in `RayTracing/include/external/`:
+
+- `tiny_obj_loader.h` for OBJ files
+- `cgltf.h` for glTF 2.0 files
+
+The reusable scene helper is `mesh_scene(...)` in `RayTracing/include/scenes/mesh.h`, invoked with `main --mesh <path>`. It detects `.obj`, `.gltf`, or `.glb`, builds a triangle BVH from the imported faces, and auto-frames the camera. Built-in scenes are selected by file name, e.g. `main --scene ferrari_1987` (add `--width/--spp/--depth` for quick previews).
 
 ## Build And Run (Vulkan GPU)
 

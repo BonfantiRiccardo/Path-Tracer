@@ -9,8 +9,11 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 add_library(raytracing_headers INTERFACE)
 target_include_directories(raytracing_headers INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-function(raytracing_add_executable target_name source_file)
-    add_executable(${target_name} ${source_file})
+function(raytracing_add_executable target_name)
+    # All arguments after target_name are treated as source files, so a target
+    # can be built from several translation units (e.g. main + the header-only
+    # library implementation TUs).
+    add_executable(${target_name} ${ARGN})
     target_link_libraries(${target_name} PRIVATE raytracing_headers)
 
     if(MSVC)
@@ -28,7 +31,25 @@ function(raytracing_add_executable target_name source_file)
     )
 endfunction()
 
-raytracing_add_executable(main src/main.cpp)
+raytracing_add_executable(main src/main.cpp src/cgltf_impl.cpp src/tinyobj_impl.cpp)
+
+# Mirror the asset folders (models/, images/) next to the main executable so
+# they can be loaded relative to the binary, independent of the working
+# directory. copy_directory_if_different (CMake 3.26+) skips unchanged files so
+# rebuilds stay fast; older CMake falls back to a plain copy.
+if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.26")
+    set(_asset_copy_cmd copy_directory_if_different)
+else()
+    set(_asset_copy_cmd copy_directory)
+endif()
+foreach(_asset_dir models images)
+    add_custom_command(TARGET main POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E ${_asset_copy_cmd}
+                "${CMAKE_CURRENT_SOURCE_DIR}/${_asset_dir}"
+                "$<TARGET_FILE_DIR:main>/${_asset_dir}"
+        COMMENT "Mirroring ${_asset_dir}/ next to the main executable"
+        VERBATIM)
+endforeach()
 raytracing_add_executable(cos_cubed src/cos_cubed.cc)
 raytracing_add_executable(cos_density src/cos_density.cc)
 raytracing_add_executable(estimate_halfway src/estimate_halfway.cc)

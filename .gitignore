@@ -11,3 +11,4 @@ build/
 
 # Ignore directory for local and temporary files.
 local/
+models

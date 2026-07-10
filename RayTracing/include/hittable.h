@@ -54,6 +54,10 @@ class hittable {
 
     // Generate a random direction from a point towards the surface of the primitive.
     virtual vec3 random(const point3& origin) const { return vec3(1,0,0); }
+
+    // Whether this hittable contains no objects (only meaningful for containers
+    // such as hittable_list; used to skip light sampling when there are no lights).
+    virtual bool empty() const { return false; }
 };
 
 // A hittable that translates another hittable by a given offset

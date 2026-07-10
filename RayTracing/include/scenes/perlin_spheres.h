@@ -3,7 +3,7 @@
 
 #include "scene_headers.h"
 
-inline scene perlin_spheres() {
+inline scene perlin_spheres_scene(int image_width, int samples_per_pixel, int max_depth) {
     scene result;
     auto& world = result.world;
 
@@ -13,9 +13,9 @@ inline scene perlin_spheres() {
     world.add(make_shared<sphere>(point3(0,2,0), 2, make_shared<lambertian>(pertext)));
 
     result.cam.aspect_ratio      = 16.0 / 9.0;
-    result.cam.image_width       = 400;
-    result.cam.samples_per_pixel = 100;
-    result.cam.max_depth         = 50;
+    result.cam.image_width       = image_width;             //400
+    result.cam.samples_per_pixel = samples_per_pixel;       //100
+    result.cam.max_depth         = max_depth;               //50
     result.cam.background        = color(0.70, 0.80, 1.00);
 
     result.cam.vfov     = 20;

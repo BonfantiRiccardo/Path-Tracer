@@ -53,9 +53,9 @@ inline scene cornell_box_scene(int image_width, int samples_per_pixel, int max_d
     result.world.add(make_shared<sphere>(point3(190,90,190), 90, glass));
 
     result.cam.aspect_ratio      = 1.0;
-    result.cam.image_width       = image_width;
-    result.cam.samples_per_pixel = samples_per_pixel;
-    result.cam.max_depth         = max_depth;
+    result.cam.image_width       = image_width;             //600
+    result.cam.samples_per_pixel = samples_per_pixel;       //1000
+    result.cam.max_depth         = max_depth;               //100
     result.cam.background        = color(0,0,0);
 
     result.cam.vfov     = 40;

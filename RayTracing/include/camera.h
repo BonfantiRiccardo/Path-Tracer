@@ -272,12 +272,16 @@ private:
             return srec.attenuation * ray_color(srec.skip_pdf_ray, depth-1, world, lights);
         
 
-        // Create a mixture PDF that combines the light sampling PDF and the material's scattering PDF
-        auto light_ptr = make_shared<hittable_pdf>(lights, rec.p);
-        mixture_pdf p(light_ptr, srec.pdf_ptr);
+        // Choose the sampling PDF. With lights present, mix light sampling (NEE)
+        // with the material's own scattering PDF. With NO lights, the mixture is a
+        // biased estimator (an empty light list samples a constant direction whose
+        // pdf is 0), so fall back to the material's PDF alone.
+        shared_ptr<pdf> sampling_pdf = lights.empty()
+            ? srec.pdf_ptr
+            : make_shared<mixture_pdf>(make_shared<hittable_pdf>(lights, rec.p), srec.pdf_ptr);
 
-        ray scattered = ray(rec.p, p.generate(), r.time());
-        auto pdf_value = p.value(scattered.direction());
+        ray scattered = ray(rec.p, sampling_pdf->generate(), r.time());
+        auto pdf_value = sampling_pdf->value(scattered.direction());
 
         if (pdf_value <= 0 || !std::isfinite(pdf_value))
             return color_from_emission;

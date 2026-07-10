@@ -3,7 +3,7 @@
 
 #include "scene_headers.h"
 
-inline scene build_abstract_life_scene() {
+inline scene abstract_life_scene(int image_width, int samples_per_pixel, int max_depth) {
     scene result;
     auto& world = result.world;
     auto ground = make_shared<lambertian>(color(0.12, 0.12, 0.16));
@@ -54,9 +54,9 @@ inline scene build_abstract_life_scene() {
     world.add(make_shared<triangle>(point3(1.5, 0.0, 1.0), vec3(2.2, 0.0, 1.2), vec3(1.5, 0.6, 0.5), vividMagenta));
 
     result.cam.aspect_ratio      = 16.0 / 9.0;
-    result.cam.image_width       = 1200;
-    result.cam.samples_per_pixel = 100;
-    result.cam.max_depth         = 10;
+    result.cam.image_width       = image_width;        //1200
+    result.cam.samples_per_pixel = samples_per_pixel;         //100
+    result.cam.max_depth         = max_depth;          //10
     result.cam.background        = color(0.70, 0.80, 1.00);
 
     result.cam.vfov     = 40;

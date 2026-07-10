@@ -4,7 +4,7 @@
 #include "scene_headers.h"
 #include "../constant_medium.h"
 
-inline scene cornell_smoke(int image_width, int samples_per_pixel, int max_depth) {
+inline scene cornell_smoke_scene(int image_width, int samples_per_pixel, int max_depth) {
     scene result;
     auto& world = result.world;
 
@@ -34,9 +34,9 @@ inline scene cornell_smoke(int image_width, int samples_per_pixel, int max_depth
     world.add(make_shared<constant_medium>(box2, 0.01, color(1,1,1)));
 
     result.cam.aspect_ratio      = 1.0;
-    result.cam.image_width       = image_width;
-    result.cam.samples_per_pixel = samples_per_pixel;
-    result.cam.max_depth         = max_depth;
+    result.cam.image_width       = image_width;             //600
+    result.cam.samples_per_pixel = samples_per_pixel;       //1000
+    result.cam.max_depth         = max_depth;               //100
     result.cam.background        = color(0,0,0);
 
     result.cam.vfov     = 40;

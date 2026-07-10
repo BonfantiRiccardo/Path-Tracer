@@ -3,7 +3,7 @@
 
 #include "scene_headers.h"
 
-inline scene build_bouncing_spheres_scene() {
+inline scene bouncing_spheres_scene(int image_width, int samples_per_pixel, int max_depth) {
     scene result;
     auto& world = result.world;
     // Create a ground object that renders a checkered texture
@@ -57,9 +57,9 @@ inline scene build_bouncing_spheres_scene() {
     world.add(make_shared<sphere>(point3(4, 1, 0), 1.0, material3));
 
     result.cam.aspect_ratio      = 16.0 / 9.0;
-    result.cam.image_width       = 400;
-    result.cam.samples_per_pixel = 100;
-    result.cam.max_depth         = 50;
+    result.cam.image_width       = image_width;         //400
+    result.cam.samples_per_pixel = samples_per_pixel;   //100
+    result.cam.max_depth         = max_depth;           //50
     result.cam.background        = color(0.70, 0.80, 1.00);
 
     result.cam.vfov = 20;
