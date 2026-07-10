@@ -57,8 +57,6 @@ Run (the CPU app has a small CLI — pass `--help` to see it):
 # pick a built-in scene by its file name in include/scenes/, at a quick preview size
 .\RayTracing\build\out\Release\main.exe --scene ferrari_1987 --width 1200 --spp 1000 --depth 100
 
-
-
 # render a single mesh file (path tried as-given, then relative to models/)
 .\RayTracing\build\out\Release\main.exe --mesh 1987_ferrari_f40/scene.gltf
 ```
