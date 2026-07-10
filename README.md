@@ -107,7 +107,7 @@ Shader output compiled and copied next to the executable by the build:
 Run example (launch from the repository root so the shader is found):
 
 ```bat
-.\VulkanGPURT\build\Release\vulkan_gpu_rt.exe --width 1200 --height 675 --spp 20 --bounces 10 --scene weekend --output VulkanGPURT/out/image.ppm
+.\VulkanGPURT\build\Release\vulkan_gpu_rt.exe --width 1200 --height 675 --spp 1000 --bounces 100 --scene weekend --output VulkanGPURT/out/image.ppm
 ```
 
 The renderer locates `path_tracer.comp.spv` relative to the current working directory, checking `VulkanGPURT/build/Release/shaders/` and `VulkanGPURT/build/Debug/shaders/`. Run it from the repository root (as shown above); if you run it from elsewhere, pass a working directory at the repo root or place a `shaders/path_tracer.comp.spv` alongside where you launch it.
