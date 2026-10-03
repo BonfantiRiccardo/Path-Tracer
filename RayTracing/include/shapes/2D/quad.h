@@ -6,10 +6,10 @@
 #include "planar_primitive.h"
 
 /**
- * 
+ *
  */
 class quad : public planar_primitive {
-  public:
+public:
     quad(const point3& Q, const vec3& u, const vec3& v, shared_ptr<material> mat) : planar_primitive(Q, u, v, mat) {
         surface_area = n.length();
 

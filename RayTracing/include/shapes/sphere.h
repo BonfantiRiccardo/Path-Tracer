@@ -3,25 +3,26 @@
 
 #include "../raytracing.h"
 #include "../hittable.h"
+#include "../onb.h"
 
 /**
- * A sphere class that inherits from the hittable interface. It represents a sphere in 3D space and implements the hit function to determine if a ray intersects with it. 
+ * A sphere class that inherits from the hittable interface. It represents a sphere in 3D space and implements the hit function to determine if a ray intersects with it.
  * The hit function calculates the intersection point and normal vector at the hit point if an intersection occurs.
  */
 class sphere : public hittable {
-  public:
+public:
     // Stationary Sphere                                                                    center stays in position
-    sphere(const point3& static_center, double radius, shared_ptr<material> mat) : center(static_center, vec3(0,0,0)), radius(std::fmax(0,radius)), mat(mat) 
+    sphere(const point3& static_center, double radius, shared_ptr<material> mat) : center(static_center, vec3(0,0,0)), radius(std::fmax(0,radius)), mat(mat)
     {
         auto rvec = vec3(radius, radius, radius);
         bbox = bvh_aabb(static_center - rvec, static_center + rvec);
     }
 
     // Moving Sphere                                                                                center moves linearly from c1 to c2
-    sphere(const point3& center1, const point3& center2, double radius, shared_ptr<material> mat) : center(center1, center2 - center1), radius(std::fmax(0,radius)), mat(mat) 
+    sphere(const point3& center1, const point3& center2, double radius, shared_ptr<material> mat) : center(center1, center2 - center1), radius(std::fmax(0,radius)), mat(mat)
     {
         point3 rvec = vec3(radius, radius, radius);
-        bvh_aabb box1(center.at(0) - rvec, center.at(0) + rvec);      // Bounding box that encloses the sphere at time 0 
+        bvh_aabb box1(center.at(0) - rvec, center.at(0) + rvec);      // Bounding box that encloses the sphere at time 0
         bvh_aabb box2(center.at(1) - rvec, center.at(1) + rvec);      // Bounding box that encloses the sphere at time 1
         bbox = bvh_aabb(box1, box2);
     }
@@ -32,15 +33,15 @@ class sphere : public hittable {
      * obtaining the following (after rearranging): t^2 * (B · B) + 2t * (B · (A - C)) + ((A - C) · (A - C) - r^2) = 0, which is a quadratic equation in t.
      * The coefficients of the quadratic equation are:
      * a = B · B
-     * b = 2 * (B · (A - C))  --> simplify with h = B · (A - C) to avoid computing 2*b
+     * b = 2 * (B · (A - C))  --> simplify with h = -b/2 = B · (C - A), so the roots are (h ± sqrt(h^2 - a*c)) / a
      * c = (A - C) · (A - C) - r^2
      */
     bool hit(const ray& r, interval ray_t, hit_record& rec) const override {
         point3 current_center = center.at(r.time());
-        vec3 oc = current_center - r.origin();      // Vector from ray origin to sphere center (A - C)
+        vec3 oc = current_center - r.origin();      // Vector from ray origin to sphere center (C - A)
         auto a = r.direction().length_squared();        // a = B · B
-        auto h = dot(r.direction(), oc);                // h = B · (A - C) 
-        auto c = oc.length_squared() - radius*radius;   // c = (A - C) · (A - C) - r^2
+        auto h = dot(r.direction(), oc);                // h = B · (C - A)
+        auto c = oc.length_squared() - radius*radius;   // c = (C - A) · (C - A) - r^2
 
         auto discriminant = h*h - a*c;
         if (discriminant < 0)
@@ -120,7 +121,7 @@ class sphere : public hittable {
     }
 
 
-  private:
+private:
     ray center;
     double radius;
     shared_ptr<material> mat;

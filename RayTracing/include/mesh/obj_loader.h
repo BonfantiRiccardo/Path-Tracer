@@ -108,8 +108,8 @@ inline shared_ptr<triangle_mesh> load_obj_mesh(const std::filesystem::path& file
     const auto& shapes = reader.GetShapes();
     const auto& materials = reader.GetMaterials();
 
-    // Build each material once up front. Previously this happened per face,
-    // which re-loaded every texture image from disk once for every triangle.
+    // Build each material once up front, so every texture image is loaded from
+    // disk once instead of once per triangle.
     std::vector<shared_ptr<material>> material_cache(materials.size());
     for (size_t material_index = 0; material_index < materials.size(); ++material_index) {
         material_cache[material_index] = obj_material_from(file_path.parent_path(), materials[material_index]);

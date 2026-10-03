@@ -15,9 +15,9 @@
  * space.
  */
 class uniform_scale : public hittable {
-  public:
+public:
     uniform_scale(shared_ptr<hittable> object, double factor)
-      : object(object), factor(factor), inv_factor(1.0 / factor) {
+        : object(object), factor(factor), inv_factor(1.0 / factor) {
         const bvh_aabb bb = object->bounding_box();
         bbox = bvh_aabb(
             point3(bb.x.min * factor, bb.y.min * factor, bb.z.min * factor),
@@ -36,7 +36,7 @@ class uniform_scale : public hittable {
 
     bvh_aabb bounding_box() const override { return bbox; }
 
-  private:
+private:
     shared_ptr<hittable> object;
     double factor;
     double inv_factor;

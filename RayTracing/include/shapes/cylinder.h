@@ -6,11 +6,11 @@
 #include "2D/plane.h"
 
 /**
- * A cylinder class that inherits from the hittable interface. It represents a cylinder in 3D space 
+ * A cylinder class that inherits from the hittable interface. It represents a cylinder in 3D space
  * defined by two center points (the centers of the circular caps) and a radius.
  */
 class cylinder : public hittable {
-  public:
+public:
     cylinder(const point3& center1, const point3& center2, double radius, shared_ptr<material> mat) : center1(center1), center2(center2), radius(std::fmax(0,radius)), mat(mat) {
         vec3 a = center2 - center1;
         double height = a.length();
@@ -46,11 +46,11 @@ class cylinder : public hittable {
     }
 
     /**
-     * Cylinder equation is: 
+     * Cylinder equation is:
      *     - axis: a = c1 - c0
      *     - normalized axis direction: anorm = a / |a|
      *     - height: h = |a|
-     * To find the intersection of a ray with the cylinder, we substitute the ray equation P(t) = P0 + t*V into the cylinder equation, 
+     * To find the intersection of a ray with the cylinder, we substitute the ray equation P(t) = P0 + t*V into the cylinder equation,
      * which can be expressed in terms of the components of the ray and the cylinder axis:
      *    - OC = P0 - c0       -->       OCperp = OC - (OC · anorm) anorm
      *    - Dperp = V - (V · anorm) anorm
@@ -64,9 +64,9 @@ class cylinder : public hittable {
         vec3 oc = r.origin() - center1;                                     // Vector from ray origin to cylinder base center
         vec3 oc_perp = oc - dot(oc, anorm) * anorm;                         // Remove component along cylinder axis
         vec3 d_perp = r.direction() - dot(r.direction(), anorm) * anorm;    // Remove component along cylinder axis
-        
+
         // Step 1: Solve quadratic equation for curved surface intersection (equation is |OCperp + t*Dperp|^2 = r^2)
-        auto A = d_perp.length_squared();                               // A = Dperp · Dperp 
+        auto A = d_perp.length_squared();                               // A = Dperp · Dperp
         auto H = dot(oc_perp, d_perp);                                  // H = OCperp · Dperp
         auto C = dot(oc_perp, oc_perp) - radius * radius;               // C = OCperp · OCperp - r^2
 
@@ -88,7 +88,7 @@ class cylinder : public hittable {
                 // Valid hit on the curved surface
                 curved_rec.t = root;
                 curved_rec.p = r.at(curved_rec.t);
-                
+
                 vec3 p_axis = center1 + m * anorm; // Projection of hit point onto cylinder axis
                 vec3 outward_normal = (curved_rec.p - p_axis) / radius; // Outward normal at the hit point
                 curved_rec.set_face_normal(r, outward_normal);
@@ -103,7 +103,7 @@ class cylinder : public hittable {
                     // Valid hit on the curved surface
                     curved_rec.t = root;
                     curved_rec.p = r.at(curved_rec.t);
-                    
+
                     vec3 p_axis = center1 + m * anorm; // Projection of hit point onto cylinder axis
                     vec3 outward_normal = (curved_rec.p - p_axis) / radius; // Outward normal at the hit point
                     curved_rec.set_face_normal(r, outward_normal);
@@ -134,7 +134,7 @@ class cylinder : public hittable {
 
         // Determine the closest valid hit among the curved surface and the caps
         hit_record closest_rec;
-        
+
         if (hit_bottom && (!hit_top || rec_bottom.t < rec_top.t) && (!rootFlag || rec_bottom.t < curved_rec.t)) {
             closest_rec = rec_bottom;
         } else if (hit_top && (!hit_bottom || rec_top.t < rec_bottom.t) && (!rootFlag || rec_top.t < curved_rec.t)) {
@@ -149,17 +149,17 @@ class cylinder : public hittable {
         return true;
     }
 
-        bvh_aabb bounding_box() const override { return bbox; }
+    bvh_aabb bounding_box() const override { return bbox; }
 
-  private:
+private:
     point3 center1;
     point3 center2;
     shared_ptr<plane> bottom = nullptr;
     shared_ptr<plane> top = nullptr;
     double radius;
     shared_ptr<material> mat;
-        bvh_aabb bbox;
-    
+    bvh_aabb bbox;
+
     shared_ptr<material> get_material() const override { return mat; }
     double area() const override { return 0.0; }
     bool sample_surface(point3 &p, vec3 &n, double &pdf) const override { return false; }

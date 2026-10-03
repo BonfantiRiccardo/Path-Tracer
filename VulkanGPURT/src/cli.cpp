@@ -13,23 +13,29 @@ namespace vkgpu {
 namespace {
 
 /**
- * Helper function to parse an unsigned integer from a string. 
+ * Helper function to parse an unsigned integer from a string.
  * Throws an exception if the value is invalid or out of range.
  */
 uint32_t parseUInt(const std::string& value, const std::string& flagName) {
-    try {
-        const unsigned long parsed = std::stoul(value);
-        if (parsed > std::numeric_limits<uint32_t>::max()) {
-            throw std::runtime_error("Value too large for " + flagName + ": " + value);
-        }
-        return static_cast<uint32_t>(parsed);
-    } catch (const std::exception&) {
+    // Digits only: std::stoull would otherwise accept a sign and wrap "-1" around to a huge value.
+    if (value.empty() || value.find_first_not_of("0123456789") != std::string::npos) {
         throw std::runtime_error("Invalid value for " + flagName + ": " + value);
     }
+
+    unsigned long long parsed = 0;
+    try {
+        parsed = std::stoull(value);
+    } catch (const std::out_of_range&) {
+        throw std::runtime_error("Value too large for " + flagName + ": " + value);
+    }
+    if (parsed > std::numeric_limits<uint32_t>::max()) {
+        throw std::runtime_error("Value too large for " + flagName + ": " + value);
+    }
+    return static_cast<uint32_t>(parsed);
 }
 
 /**
- * Helper function to parse a double from a string. 
+ * Helper function to parse a double from a string.
  * Throws an exception if the value is invalid or not finite.
  */
 double parseDouble(const std::string& value, const std::string& flagName) {
@@ -66,7 +72,7 @@ void printUsage() {
 }
 
 /**
- * Parses command-line arguments and returns a RenderConfig struct with the specified settings. 
+ * Parses command-line arguments and returns a RenderConfig struct with the specified settings.
  * Throws exceptions for invalid arguments or values.
  */
 RenderConfig parseArguments(int argc, char** argv) {
@@ -131,8 +137,8 @@ RenderConfig parseArguments(int argc, char** argv) {
 }
 
 /**
- * Prints a banner with the current render configuration settings. 
- * This is called before starting the rendering process to inform the user of the parameters 
+ * Prints a banner with the current render configuration settings.
+ * This is called before starting the rendering process to inform the user of the parameters
  * being used.
  */
 void printRunBanner(const RenderConfig& config) {

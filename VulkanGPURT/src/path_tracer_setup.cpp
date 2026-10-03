@@ -13,8 +13,8 @@
 namespace vkgpu {
 
 /**
- * Finds a queue family index that supports compute operations. A queue family is a group of queues that have the same capabilities. 
- * This function queries the physical device for its queue families and checks if any of them support the VK_QUEUE_COMPUTE_BIT flag, 
+ * Finds a queue family index that supports compute operations. A queue family is a group of queues that have the same capabilities.
+ * This function queries the physical device for its queue families and checks if any of them support the VK_QUEUE_COMPUTE_BIT flag,
  * which indicates that they can be used for compute operations. If a suitable queue family is found, its index is returned.
  */
 std::optional<uint32_t> PathTracer::Impl::findComputeQueueFamily(VkPhysicalDevice device) {
@@ -68,8 +68,8 @@ GpuCamera PathTracer::Impl::uploadableCamera(const SceneCamera& camera) {
 }
 
 /**
- * Finds a suitable memory type for a Vulkan buffer. This function queries the physical device's memory properties and checks 
- * for a memory type that matches the specified type filter and has the required properties (e.g., host visible, coherent). 
+ * Finds a suitable memory type for a Vulkan buffer. This function queries the physical device's memory properties and checks
+ * for a memory type that matches the specified type filter and has the required properties (e.g., host visible, coherent).
  * If a suitable memory type is found, its index is returned. If no suitable memory type is found, an exception is thrown.
  */
 uint32_t PathTracer::Impl::findMemoryType(
@@ -92,8 +92,8 @@ uint32_t PathTracer::Impl::findMemoryType(
 }
 
 /**
- * Creates a Vulkan instance, which is the connection between the application and the Vulkan library. 
- * This function fills out a VkApplicationInfo structure with information about the application, and then uses it 
+ * Creates a Vulkan instance, which is the connection between the application and the Vulkan library.
+ * This function fills out a VkApplicationInfo structure with information about the application, and then uses it
  * to create a VkInstanceCreateInfo structure.
  */
 void PathTracer::Impl::createInstance() {
@@ -115,7 +115,7 @@ void PathTracer::Impl::createInstance() {
 }
 
 /**
- * Picks a suitable physical device (GPU) that supports compute operations. 
+ * Picks a suitable physical device (GPU) that supports compute operations.
  * This function enumerates the available physical devices and checks each one for compute capabilities.
  */
 void PathTracer::Impl::pickPhysicalDevice() {
@@ -265,7 +265,7 @@ void PathTracer::Impl::createBuffer(
 }
 
 /**
- * Creates the buffers for the scene data, output image, and camera data. 
+ * Creates the buffers for the scene data, output image, and camera data.
  * This function calls createBuffer() to create each buffer and allocate memory for it.
  */
 void PathTracer::Impl::createBuffers() {
@@ -315,7 +315,7 @@ void PathTracer::Impl::createBuffers() {
 }
 
 /**
- * Creates the descriptor set layout for the path tracer. The descriptor set layout describes the types of resources (buffers, images, etc.) 
+ * Creates the descriptor set layout for the path tracer. The descriptor set layout describes the types of resources (buffers, images, etc.)
  * that will be accessed by the shader and how they are organized.
  */
 void PathTracer::Impl::createDescriptorSetLayout() {
@@ -350,7 +350,7 @@ void PathTracer::Impl::createDescriptorSetLayout() {
 }
 
 /**
- * Creates the descriptor pool for the path tracer. The descriptor pool is used to allocate descriptor sets, which are the actual bindings of 
+ * Creates the descriptor pool for the path tracer. The descriptor pool is used to allocate descriptor sets, which are the actual bindings of
  * resources that will be used by the shader.
  */
 void PathTracer::Impl::createDescriptorPool() {
@@ -413,7 +413,7 @@ std::filesystem::path PathTracer::Impl::resolveShaderPath() const {
 }
 
 /**
- * Creates the compute pipeline for the path tracer. Reads the shader code from the file, creates a shader module, and then creates a compute pipeline 
+ * Creates the compute pipeline for the path tracer. Reads the shader code from the file, creates a shader module, and then creates a compute pipeline
  * using that shader module.
  */
 void PathTracer::Impl::createComputePipeline() {

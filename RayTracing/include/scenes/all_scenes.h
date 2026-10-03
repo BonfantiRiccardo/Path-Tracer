@@ -1,3 +1,6 @@
+#ifndef ALL_SCENES_H
+#define ALL_SCENES_H
+
 #include "abstract_life.h"
 #include "bouncing_spheres.h"
 #include "weekend.h"
@@ -12,3 +15,5 @@
 #include "next_week.h"
 #include "mesh.h"
 #include "ferrari_1987.h"
+
+#endif // ALL_SCENES_H

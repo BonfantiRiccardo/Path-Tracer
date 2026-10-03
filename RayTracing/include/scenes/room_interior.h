@@ -69,7 +69,7 @@ inline scene room_interior_scene(int image_width, int samples_per_pixel, int max
     world.add(make_shared<quad>(point3(closetMin.x(), closetMax.y(), closetMin.z()), vec3(closetMax.x() - closetMin.x(), 0.0, 0.0), vec3(0.0, 0.0, closetMax.z() - closetMin.z()), closetWood));
     world.add(make_shared<quad>(point3(closetMin.x(), closetMin.y(), closetMax.z()), vec3(closetMax.x() - closetMin.x(), 0.0, 0.0), vec3(0.0, 0.0, closetMin.z() - closetMax.z()), closetWood));
 
-    // 3. Table: larger and closer to the camera.
+    // 3. Table with four metal legs.
     world.add(make_shared<aabb>(point3(-2.2, 0.86, -2.4), point3(2.2, 0.96, -0.2), tableTop));
     world.add(make_shared<cylinder>(point3(-1.9, 0.0, -2.15), point3(-1.9, 0.86, -2.15), 0.06, tableLeg));
     world.add(make_shared<cylinder>(point3( 1.9, 0.0, -2.15), point3( 1.9, 0.86, -2.15), 0.06, tableLeg));
@@ -79,7 +79,7 @@ inline scene room_interior_scene(int image_width, int samples_per_pixel, int max
     // 3b. Rug under the table.
     world.add(make_shared<quad>(point3(-2.6, 0.005, -2.9), vec3(5.3, 0.0, 0.0), vec3(0.0, 0.0, 3.3), rugFabric));
 
-    // 3c. Chair moved to the left side of the table.
+    // 3c. Chair on the left side of the table.
     world.add(make_shared<aabb>(point3(-3.35, 0.46, -1.85), point3(-2.45, 0.54, -0.95), chairSeat));
     world.add(make_shared<aabb>(point3(-3.35, 0.54, -1.85), point3(-3.25, 1.35, -0.95), chairSeat));
     world.add(make_shared<cylinder>(point3(-3.28, 0.0, -1.78), point3(-3.28, 0.46, -1.78), 0.03, chairLeg));

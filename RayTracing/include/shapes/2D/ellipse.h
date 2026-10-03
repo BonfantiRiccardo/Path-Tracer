@@ -6,12 +6,13 @@
 #include "planar_primitive.h"
 
 /**
- * An ellipse class that inherits from the hittable interface. It represents an ellipse in 3D space and implements the hit function to determine if a ray intersects with it. 
- * The hit function calculates the intersection point and normal vector at the hit point if an intersection occurs, using the Möller-Trumbore algorithm.
+ * An ellipse class that inherits from planar_primitive. It represents an ellipse in 3D space.
+ * planar_primitive::hit computes the intersection point and normal. This class only tests whether the planar coordinates lie inside the unit circle
+ * (u and v are scaled by the two semi-axes).
  */
 class ellipse : public planar_primitive {
-  public:
-    ellipse(const point3& Q, const vec3& normal, double d1, double d2, shared_ptr<material> mat) 
+public:
+    ellipse(const point3& Q, const vec3& normal, double d1, double d2, shared_ptr<material> mat)
                     : planar_primitive(Q, u_basis(normal, d1), v_basis(normal, d1, d2), mat), d1(d1), d2(d2) {
         set_bounding_box();
     }
@@ -34,7 +35,7 @@ class ellipse : public planar_primitive {
         // Given the hit point in plane coordinates, return false if it is outside the
         // primitive, otherwise set the hit record UV coordinates and return true.
 
-        // Check if the hit point is outside the ellipse using barycentric coordinates (a, b)
+        // Check if the hit point is outside the ellipse using planar coordinates (a, b)
         if (a*a + b*b > 1.0)        // since u,v are already scaled by d1,d2; a,b will be normalized ellipse coordinates
             return false;
 
@@ -43,22 +44,22 @@ class ellipse : public planar_primitive {
         return true;
     }
 
-    private:
-        double d1, d2; // semi-major and semi-minor axes of the ellipse
-    
-        static vec3 u_basis(const vec3& normal, double d1) {
-            vec3 n = unit_vector(normal);
-            vec3 u = cross(n, vec3(1, 0, 0)); // First spanning vector in the plane of the ellipse
-            if (u.length_squared() < 1e-8) // If normal is parallel to (1, 0, 0), use a different vector to avoid zero cross product
-                u = cross(n, vec3(0, 1, 0));
-            return unit_vector(u) * d1;
-        }
+private:
+    double d1, d2; // semi-major and semi-minor axes of the ellipse
 
-        static vec3 v_basis(const vec3& normal, double d1, double d2) {
-            vec3 n = unit_vector(normal);
-            vec3 v = cross(n, u_basis(normal, d1)); // Second spanning vector in the plane of the ellipse, orthogonal to the first
-            return unit_vector(v) * d2;
-        }
+    static vec3 u_basis(const vec3& normal, double d1) {
+        vec3 n = unit_vector(normal);
+        vec3 u = cross(n, vec3(1, 0, 0)); // First spanning vector in the plane of the ellipse
+        if (u.length_squared() < 1e-8) // If normal is parallel to (1, 0, 0), use a different vector to avoid zero cross product
+            u = cross(n, vec3(0, 1, 0));
+        return unit_vector(u) * d1;
+    }
+
+    static vec3 v_basis(const vec3& normal, double d1, double d2) {
+        vec3 n = unit_vector(normal);
+        vec3 v = cross(n, u_basis(normal, d1)); // Second spanning vector in the plane of the ellipse, orthogonal to the first
+        return unit_vector(v) * d2;
+    }
 };
 
 #endif // ELLIPSE_H

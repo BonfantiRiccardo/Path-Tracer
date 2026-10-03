@@ -26,7 +26,8 @@ void PathTracer::Impl::dispatch() {
     zeroOutputBuffer();
 
     // Cap the ray-bounce work per pixel per dispatch. Fewer bounces allow more samples per batch and
-    // vice versa, so each submission does a similar, bounded amount of work regardless of the settings.
+    // vice versa, so the work per pixel in each submission stays bounded whatever --spp and --bounces are
+    // (it still grows with resolution and sphere count).
     constexpr uint32_t kRayBudgetPerBatch = 512u;
     const uint32_t samplesPerBatch = std::clamp(
         kRayBudgetPerBatch / std::max(1u, config_.maxBounces),

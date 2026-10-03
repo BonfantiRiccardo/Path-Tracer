@@ -1,15 +1,16 @@
 #ifndef HITTABLE_LIST_H
 #define HITTABLE_LIST_H
 
-#include "../include/raytracing.h"
-#include <vector>
+#include "raytracing.h"
+#include "hittable.h"
 
+#include <vector>
 
 /**
  * A list of hittable objects that can be intersected by a ray.
  */
 class hittable_list : public hittable {
-  public:
+public:
     std::vector<shared_ptr<hittable>> objects;
 
     hittable_list() {}
@@ -64,8 +65,8 @@ class hittable_list : public hittable {
         return objects[random_int(0, int(objects.size()) - 1)]->random(origin);
     }
 
-    private:
-        bvh_aabb bbox; // Bounding box for the entire list, used for BVH construction
+private:
+    bvh_aabb bbox; // Bounding box for the entire list, used for BVH construction
 };
 
 #endif

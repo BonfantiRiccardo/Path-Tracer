@@ -4,7 +4,7 @@
 #include "raytracing.h"
 
 class perlin {
-  public:
+public:
     perlin() {
         for (int i = 0; i < point_count; i++) {
             randvec[i] = unit_vector(vec3::random(-1,1));
@@ -55,7 +55,7 @@ class perlin {
         return std::fabs(accum);
     }
 
-  private:
+private:
     static const int point_count = 256;
     vec3 randvec[point_count];
     int perm_x[point_count];

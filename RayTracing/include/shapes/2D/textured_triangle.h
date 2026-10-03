@@ -12,7 +12,7 @@
  * true texture UVs instead of dumping the barycentric coordinates.
  */
 class textured_triangle : public hittable {
-  public:
+public:
     // Flat-shaded: normal is the geometric face normal.
     textured_triangle(
         const point3& p0,
@@ -96,7 +96,7 @@ class textured_triangle : public hittable {
 
     bvh_aabb bounding_box() const override { return bbox; }
 
-  private:
+private:
     void set_bounding_box() {
         const double epsilon = 1e-4;
         bbox = bvh_aabb(

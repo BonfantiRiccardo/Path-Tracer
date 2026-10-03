@@ -15,9 +15,9 @@ std::vector<char> readBinaryFile(const std::filesystem::path& filePath) {
     if (!file.is_open()) {
         throw std::runtime_error("Failed to open file: " + filePath.string());
     }
-    
+
     // Get the size of the file by checking the position of the cursor at the end
-    const std::streampos fileSize = file.tellg();  
+    const std::streampos fileSize = file.tellg();
     if (fileSize <= 0) {
         throw std::runtime_error("File is empty: " + filePath.string());
     }

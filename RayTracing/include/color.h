@@ -16,12 +16,12 @@ inline double linear_to_gamma(double linear_component) {
 /**
  * Write the translated [0,255] value of each color component.
  */
-void write_color(std::ostream& out, const vec3& pixel_color) {
+inline void write_color(std::ostream& out, const vec3& pixel_color) {
     auto r = pixel_color.x();
     auto g = pixel_color.y();
     auto b = pixel_color.z();
 
-    // Replace NaN components with zero to avoid acne
+    // Replace NaN components with zero to avoid black or corrupted pixels
     if (r != r) r = 0.0;
     if (g != g) g = 0.0;
     if (b != b) b = 0.0;

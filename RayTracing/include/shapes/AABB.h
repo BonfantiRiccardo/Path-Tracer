@@ -5,12 +5,12 @@
 #include "../hittable.h"
 
 /**
- * A AABB (Axis-Aligned Bounding Box) class that inherits from the hittable interface. It represents a 
- * box in 3D space defined by two corner points (min and max) and implements the hit function to 
+ * A AABB (Axis-Aligned Bounding Box) class that inherits from the hittable interface. It represents a
+ * box in 3D space defined by two corner points (min and max) and implements the hit function to
  * determine if a ray intersects with it.
  */
 class aabb : public hittable {
-  public:
+public:
     aabb(const point3& min, const point3& max, shared_ptr<material> mat)
         : min(  // Ensure min and max are correctly ordered regardless of input
             point3(
@@ -30,18 +30,18 @@ class aabb : public hittable {
         bbox(this->min, this->max) {}   // The bounding box of the AABB is just itself
 
     /**
-     * AABB equation is: min.x <= P.x <= max.x, min.y <= P.y <= max.y, min.z <= P.z <= max.z, where P is a point on the box, 
+     * AABB equation is: min.x <= P.x <= max.x, min.y <= P.y <= max.y, min.z <= P.z <= max.z, where P is a point on the box,
      * min is the minimum corner of the box, and max is the maximum corner of the box.
      * To find the intersection of a ray with the box, we substitute the ray equation P(t) = A + t*B into the box equation,
      * which can be expressed in terms of the components of the ray and the box corners:
-     * 
+     * t = (min - A) / B and t = (max - A) / B on each axis (slab method). The hit is the largest entry t and the smallest exit t.
      */
     bool hit(const ray& r, interval ray_t, hit_record& rec) const override {
         double epsilon = 1e-8; // Small threshold to handle numerical precision issues
         if (
-                std::fabs(r.direction().x()) < epsilon && 
+                std::fabs(r.direction().x()) < epsilon &&
                 (r.origin().x() < min.x() || r.origin().x() > max.x())  ||
-                std::fabs(r.direction().y()) < epsilon && 
+                std::fabs(r.direction().y()) < epsilon &&
                 (r.origin().y() < min.y() || r.origin().y() > max.y())  ||
                 std::fabs(r.direction().z()) < epsilon &&
                 (r.origin().z() < min.z() || r.origin().z() > max.z())
@@ -102,7 +102,7 @@ class aabb : public hittable {
     double area() const override { return 0.0; }
     bool sample_surface(point3 &p, vec3 &n, double &pdf) const override { return false; }
 
-  private:
+private:
     point3 min;
     point3 max;
     shared_ptr<material> mat;

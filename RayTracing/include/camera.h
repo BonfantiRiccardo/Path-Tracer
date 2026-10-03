@@ -59,17 +59,17 @@ public:
                 if (j >= image_height)
                     break;  // No more rows to process
 
-                // Render the assigned row of pixels (same code as original single-threaded loop)
+                // Render the assigned row of pixels
                 for (int i = 0; i < image_width; i++) {
                     color pixel_color(0,0,0);
 
-                    // Implement stratified sampling by taking sqrt_spp samples in a grid pattern within the pixel area (part of "THE REST OF YOUR LIFE" article) 
+                    // Implement stratified sampling by taking sqrt_spp samples in a grid pattern within the pixel area (part of "THE REST OF YOUR LIFE" article)
                     for (int s_j = 0; s_j < sqrt_spp; s_j++) {
-                      for (int s_i = 0; s_i < sqrt_spp; s_i++) {
-                        ray r = get_ray(i, j, s_i, s_j);
-                        pixel_color += ray_color(r, max_depth, world, lights);
+                        for (int s_i = 0; s_i < sqrt_spp; s_i++) {
+                            ray r = get_ray(i, j, s_i, s_j);
+                            pixel_color += ray_color(r, max_depth, world, lights);
+                        }
                     }
-                }
                     // Update the framebuffer with the computed pixel color, applying samples scale factor
                     framebuffer[
                         static_cast<size_t>(j) * static_cast<size_t>(image_width) + static_cast<size_t>(i)
@@ -128,13 +128,13 @@ public:
             return;
         }
 
-        // Final render loop
+        // Write the framebuffer to the output file
         out_file << "P3\n" << image_width << " " << image_height << "\n255\n";
 
         for (int j = 0; j < image_height; j++) {
             for (int i = 0; i < image_width; i++) {
                 // Simply write the color of the framebuffer to the file
-                write_color(out_file, 
+                write_color(out_file,
                             framebuffer[static_cast<size_t>(j) * static_cast<size_t>(image_width) + static_cast<size_t>(i)]
                         );
             }
@@ -170,11 +170,11 @@ private:
         recip_sqrt_spp = 1.0 / sqrt_spp;
 
         // Determine color scale factor for sum of pixel samples.
-        pixel_samples_scale = 1.0 / samples_per_pixel;
+        //pixel_samples_scale = 1.0 / samples_per_pixel;
 
         center = lookfrom;
 
-        // Determine viewport dimensions.        
+        // Determine viewport dimensions.
         auto theta = degrees_to_radians(vfov);
         auto h = std::tan(theta/2);
         auto viewport_height = 2 * h * focus_dist;
@@ -233,7 +233,7 @@ private:
         return vec3(px, py, 0);
     }
 
-    /** 
+    /**
      * Returns the vector to a random point in the [-.5,-.5]-[+.5,+.5] unit square.
     */
     vec3 sample_square() const {
@@ -255,9 +255,9 @@ private:
         if (depth <= 0)
             return color(0,0,0);
 
-            
+
         hit_record rec;
-        
+
         // If the ray hits nothing, return the background color.
         if (!world.hit(r, interval(0.001, infinity), rec))
             return background;
@@ -270,7 +270,7 @@ private:
 
         if (srec.skip_pdf)
             return srec.attenuation * ray_color(srec.skip_pdf_ray, depth-1, world, lights);
-        
+
 
         // Choose the sampling PDF. With lights present, mix light sampling (NEE)
         // with the material's own scattering PDF. With NO lights, the mixture is a

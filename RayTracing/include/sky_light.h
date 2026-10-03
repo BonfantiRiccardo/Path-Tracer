@@ -14,14 +14,14 @@
  * environment.
  */
 class sky_light : public material {
-  public:
+public:
     sky_light(shared_ptr<texture> tex, double intensity = 1.0) : tex(tex), intensity(intensity) {}
 
     color emitted(const ray& r_in, const hit_record& rec, double u, double v, const point3& p) const override {
         return intensity * tex->value(u, v, p);
     }
 
-  private:
+private:
     shared_ptr<texture> tex;
     double intensity;
 };

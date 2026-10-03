@@ -3,24 +3,24 @@
 ![Path Tracer Render](docs/next_week.png)
 
 
-This repository contains your path tracer implementation in two versions:
+This repository contains a path tracer in two versions:
 
 1. `RayTracing`: CPU implementation following [Ray Tracing in One Weekend](https://raytracing.github.io/).
-2. `VulkanGPURT`: GPU implementation using a Vulkan compute shader (headless, no window/swapchain), writing the final image to a `.ppm` file.
+2. `VulkanGPURT`: GPU implementation using a Vulkan compute shader (headless, no window/swapchain).
 
-Both versions render the same style of path-traced scenes and produce image output files.
+Both versions write the rendered image to a `.ppm` file.
 
 ## Hardcoded scenes results
 ![Weekend Scene](docs/weekend.png)
-- `weekend.png`: Render of the "weekend" scene with a variety of spheres and materials.
+- `weekend.png`: the final scene of the first book, many small spheres with diffuse, metal and glass materials.
 ![Room Interior Scene](docs/room_interior.png)
-- `room_interior.png`: Render of the "room interior" scene with a Cornell box setup and a light source.
+- `room_interior.png`: a textured room with a table, a chair, a rug, a painting, a glass bottle and a ceiling light.
 ![Abstract Life Scene](docs/abstract_life.png)
-- `abstract_life.png`: Render of the "abstract life" scene with a more artistic arrangement of objects and materials.
+- `abstract_life.png`: planes, boxes, spheres, cylinders, cones and triangles with mixed materials and depth of field.
 ![Cornell Box Scene](docs/final_cornell.png)
-- `cornell_box.png`: Render of the classic Cornell box scene with a box and a sphere.
+- `final_cornell.png`: the classic Cornell box with a rotated box and a glass sphere.
 ![Ferrari Scene](docs/ferrari.png)
-- `ferrari.png`: Render of a Ferrari 1987 model in a scene with a simple background and lighting.
+- `ferrari.png`: a 1987 Ferrari F40 glTF model on a street at night, with a sky dome, a brick wall and a street lamp.
 
 
 ## Build And Run (CPU)
@@ -48,13 +48,13 @@ The CMake build also produces the small demo executables from `RayTracing/src/`:
 - `pi`
 - `sphere_plot`
 
-Run (the CPU app has a small CLI — pass `--help` to see it):
+Run (pass `--help` to see all options):
 
 ```bash
 # default scene (cornell_box) at the default settings
 .\RayTracing\build\out\Release\main.exe
 
-# pick a built-in scene by its file name in include/scenes/, at a quick preview size
+# pick a built-in scene by its file name in include/scenes/ and override the render settings
 .\RayTracing\build\out\Release\main.exe --scene ferrari_1987 --width 1200 --spp 1000 --depth 100
 
 # render a single mesh file (path tried as-given, then relative to models/)
@@ -68,18 +68,19 @@ Options:
 - `--width N`, `--spp N`, `--depth N`: image width, samples per pixel, and max ray bounces.
 - `-h`, `--help`: print usage and the list of scenes.
 
-The build mirrors the `models/` and `images/` asset folders next to the executable, so assets load regardless of the working directory.
+The build copies the `models/` and `images/` asset folders next to the executable, so assets load regardless of the working directory.
 
 Output image:
 
 - `RayTracing/build/out/<config>/image.ppm`
 
-Mesh import support is available through header-only loaders in `RayTracing/include/external/`:
+Third-party header-only libraries in `RayTracing/include/external/`:
 
 - `tiny_obj_loader.h` for OBJ files
 - `cgltf.h` for glTF 2.0 files
+- `stb_image.h` for image textures
 
-The reusable scene helper is `mesh_scene(...)` in `RayTracing/include/scenes/mesh.h`, invoked with `main --mesh <path>`. It detects `.obj`, `.gltf`, or `.glb`, builds a triangle BVH from the imported faces, and auto-frames the camera. Built-in scenes are selected by file name, e.g. `main --scene ferrari_1987` (add `--width/--spp/--depth` for quick previews).
+`--mesh` uses `mesh_scene(...)` from `RayTracing/include/scenes/mesh.h`: it picks the loader from the extension (`.obj`, `.gltf` or `.glb`), builds a BVH over the imported triangles and places the camera so the whole model is in view.
 
 ## Build And Run (Vulkan GPU)
 
@@ -108,7 +109,7 @@ Run example (launch from the repository root so the shader is found):
 .\VulkanGPURT\build\Release\vulkan_gpu_rt.exe --width 1200 --height 675 --spp 1000 --bounces 100 --scene weekend --output VulkanGPURT/out/image.ppm
 ```
 
-The renderer locates `path_tracer.comp.spv` relative to the current working directory, checking `VulkanGPURT/build/Release/shaders/` and `VulkanGPURT/build/Debug/shaders/`. Run it from the repository root (as shown above); if you run it from elsewhere, pass a working directory at the repo root or place a `shaders/path_tracer.comp.spv` alongside where you launch it.
+The renderer looks for `path_tracer.comp.spv` relative to the current working directory: first in `VulkanGPURT/build/Release/shaders/` and `VulkanGPURT/build/Debug/shaders/`, then in `shaders/`, `../shaders/` and `../../shaders/`. Run it from the repository root as shown above, or from a folder that contains `shaders/path_tracer.comp.spv` (for example `VulkanGPURT/build/Release/`).
 
 Supported arguments:
 
@@ -120,6 +121,7 @@ Supported arguments:
 - `--seed <int>`
 - `--scene <weekend|two-sphere>`
 - `--output <path>`
+- `--help`
 
 Default render configuration:
 

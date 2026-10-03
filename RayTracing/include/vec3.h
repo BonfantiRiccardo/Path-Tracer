@@ -5,7 +5,7 @@
  * A 3D vector class that can also be used to represent points in 3D space. It includes basic vector operations and utility functions.
  */
 class vec3 {
-  public:
+public:
     double e[3];
 
     vec3() : e{0,0,0} {}
@@ -114,7 +114,7 @@ inline vec3 unit_vector(const vec3& v) {
 inline vec3 random_unit_vector() {
     while (true) {
         auto p = vec3::random(-1, 1);
-        auto lensq = p.length_squared();    //Compute lenght for normalization.
+        auto lensq = p.length_squared();    //Compute length for normalization.
         if (1e-160 < lensq && lensq <= 1)   // Ensure that the random point is within the unit sphere and not too close to zero.
             return p / std::sqrt(lensq);
     }

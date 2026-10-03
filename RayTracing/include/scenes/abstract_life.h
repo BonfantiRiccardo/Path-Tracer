@@ -35,7 +35,7 @@ inline scene abstract_life_scene(int image_width, int samples_per_pixel, int max
     // Radius is 0.6, so y-center is 0.6 to touch the ground
     world.add(make_shared<sphere>(point3(0.0, 0.6, 1.0), 0.6, glass));
     // Resting on the copper AABB (top is y=1.2, radius 0.4 -> y-center 1.6)
-    world.add(make_shared<sphere>(point3(2.2, 1.6, -0.7), 0.4, vividRed)); 
+    world.add(make_shared<sphere>(point3(2.2, 1.6, -0.7), 0.4, vividRed));
 
     // 4. Cylinders (One upright, one tilted/rolling)
     // Upright on the blue AABB (top is y=0.6)
@@ -49,7 +49,7 @@ inline scene abstract_life_scene(int image_width, int samples_per_pixel, int max
     // Tilted: Lying flat on the ground. Center y matches radius, apex y is 0.
     world.add(make_shared<cone>(point3(-1.5, 0.5, 1.0), 0.5, point3(-3.5, 0.0, 2.5), gold));
 
-    // 6. Triangles (Used as glass shards leaning against the copper AABB)
+    // 6. Triangles (colored shards leaning against the copper AABB)
     world.add(make_shared<triangle>(point3(1.5, 0.0, 0.5), vec3(0.8, 0.0, 0.0), vec3(1.5, 0.8, -0.2), vividYellow));
     world.add(make_shared<triangle>(point3(1.5, 0.0, 1.0), vec3(2.2, 0.0, 1.2), vec3(1.5, 0.6, 0.5), vividMagenta));
 

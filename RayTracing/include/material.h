@@ -5,10 +5,10 @@
 #include "texture.h"
 #include "pdf.h"
 
-// This class is used to store the results of a scattering event, including the attenuation color, the PDF for the scattered direction, 
+// This class is used to store the results of a scattering event, including the attenuation color, the PDF for the scattered direction,
 // and whether to skip the PDF calculation for certain materials
 class scatter_record {
-  public:
+public:
     color attenuation;
     shared_ptr<pdf> pdf_ptr;
     bool skip_pdf;
@@ -16,39 +16,39 @@ class scatter_record {
 };
 
 class material {
-  public:
+public:
     virtual ~material() = default;
 
-  // Scatter function that computes the scattered ray and attenuation color for a given incoming ray and hit record.
-  // Pass the scatter_record to store the results of the scattering event
-  virtual bool scatter(const ray& r_in, const hit_record& rec, scatter_record& srec) const {
-    return false;
-  }
+    // Scatter function that computes the scattered ray and attenuation color for a given incoming ray and hit record.
+    // Pass the scatter_record to store the results of the scattering event
+    virtual bool scatter(const ray& r_in, const hit_record& rec, scatter_record& srec) const {
+        return false;
+    }
 
-  // Emitted radiance from the material (for emissive materials). Default: black.
-  virtual color emitted() const {
-    return color(0,0,0);
-  }
+    // Emitted radiance from the material (for emissive materials). Default: black.
+    virtual color emitted() const {
+        return color(0,0,0);
+    }
 
-  virtual color emitted(double u, double v, const point3& p) const {
-    return color(0,0,0);
-  }
+    virtual color emitted(double u, double v, const point3& p) const {
+        return color(0,0,0);
+    }
 
-  virtual color emitted(const ray& r_in, const hit_record& rec, double u, double v, const point3& p) const {
-    return color(0,0,0);
-  }
+    virtual color emitted(const ray& r_in, const hit_record& rec, double u, double v, const point3& p) const {
+        return color(0,0,0);
+    }
 
-  virtual double scattering_pdf(const ray& r_in, const hit_record& rec, const ray& scattered) const {
-    return 0;
-  }
+    virtual double scattering_pdf(const ray& r_in, const hit_record& rec, const ray& scattered) const {
+        return 0;
+    }
 };
 
 /**
- * Lambertian material that scatters rays in a random direction within the hemisphere oriented around the hit normal. 
+ * Lambertian material that scatters rays in a random direction within the hemisphere oriented around the hit normal.
  * The color of the scattered ray is determined by the albedo of the material.
  */
 class lambertian : public material {
-  public:
+public:
     lambertian(const color& albedo) : tex(make_shared<solid_color>(albedo)) {}
     lambertian(shared_ptr<texture> tex) : tex(tex) {}
 
@@ -68,23 +68,23 @@ class lambertian : public material {
         return cos_theta < 0 ? 0 : cos_theta/pi;
     }
 
-  private:
+private:
     shared_ptr<texture> tex;
 };
 
 
-/** 
+/**
  * Metal material that reflects rays in a deterministic manner based on the hit normal.
  * The color of the reflected ray is determined by the albedo of the material, and a fuzz factor can be applied to create a blurred reflection effect.
  */
 class metal : public material {
-  public:
+public:
     metal(const color& albedo, double fuzz) : albedo(albedo), fuzz(fuzz < 1 ? fuzz : 1) {}
 
     bool scatter(const ray& r_in, const hit_record& rec, scatter_record& srec) const override {
         vec3 reflected = reflect(r_in.direction(), rec.normal);
         reflected = unit_vector(reflected) + (fuzz * random_unit_vector());
-        
+
         srec.attenuation = albedo;
         srec.pdf_ptr = nullptr;
         srec.skip_pdf = true;
@@ -93,18 +93,18 @@ class metal : public material {
         return true;
     }
 
-  private:
+private:
     color albedo;
     double fuzz;
 };
 
 /**
- * Dielectric material that refracts rays based on the hit normal and the material's refractive index. 
- * The color of the refracted ray is determined by the attenuation factor (white for dielectrics). 
+ * Dielectric material that refracts rays based on the hit normal and the material's refractive index.
+ * The color of the refracted ray is determined by the attenuation factor (white for dielectrics).
  * The scatter function computes the refracted ray direction using Snell's law and handles total internal reflection when necessary.
  */
 class dielectric : public material {
-  public:
+public:
     dielectric(double refraction_index) : refraction_index(refraction_index) {}
 
     bool scatter(const ray& r_in, const hit_record& rec, scatter_record& srec) const override {
@@ -129,7 +129,7 @@ class dielectric : public material {
         return true;
     }
 
-  private:
+private:
     // Refractive index in vacuum, or the ratio of the material's refractive index over
     // the refractive index of the enclosing media.
     double refraction_index;
@@ -147,7 +147,7 @@ class dielectric : public material {
  * emitted color when hit.
  */
 class diffuse_light : public material {
-  public:
+public:
     diffuse_light(shared_ptr<texture> tex) : tex(tex) {}
     diffuse_light(const color& emit) : tex(make_shared<solid_color>(emit)) {}
 
@@ -156,18 +156,18 @@ class diffuse_light : public material {
     }
 
     color emitted(const ray& r_in, const hit_record& rec, double u, double v, const point3& p) const override {
-      if (!rec.front_face)
-        return color(0, 0, 0);
-      return tex->value(u, v, p);
+        if (!rec.front_face)
+            return color(0, 0, 0);
+        return tex->value(u, v, p);
     }
 
-  private:
+private:
     shared_ptr<texture> tex;
 };
 
 // Isotropic material that scatters rays in a random direction with equal probability in all directions.
 class isotropic : public material {
-  public:
+public:
     isotropic(const color& albedo) : tex(make_shared<solid_color>(albedo)) {}
     isotropic(shared_ptr<texture> tex) : tex(tex) {}
 
@@ -179,10 +179,10 @@ class isotropic : public material {
     }
 
     double scattering_pdf(const ray& r_in, const hit_record& rec, const ray& scattered) const override {
-      return 1 / (4 * pi);        // Scatter in all directions with equal probability
+        return 1 / (4 * pi);        // Scatter in all directions with equal probability
     }
 
-  private:
+private:
     shared_ptr<texture> tex;
 };
 

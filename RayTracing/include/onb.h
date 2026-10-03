@@ -1,14 +1,14 @@
 #ifndef ONB_H
 #define ONB_H
 
-#include "vec3.h"
+#include "raytracing.h"
 #include <cmath>
 
-/** 
+/**
  * Orthonormal basis for 3D space, used to transform vectors between local and world coordinates
  */
 class onb {
-  public:
+public:
     onb(const vec3& n) {
         axis[2] = unit_vector(n);
         vec3 a = (std::fabs(axis[2].x()) > 0.9) ? vec3(0,1,0) : vec3(1,0,0);
@@ -25,7 +25,7 @@ class onb {
         return (v[0] * axis[0]) + (v[1] * axis[1]) + (v[2] * axis[2]);
     }
 
-  private:
+private:
     vec3 axis[3];
 };
 

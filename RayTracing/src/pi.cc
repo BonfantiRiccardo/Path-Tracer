@@ -9,9 +9,9 @@ int main() {
     int inside_circle = 0;
 
     // Number of random points to generate, Law of Diminishing Returns:
-    // The more points we generate, the closer we get to the actual value of Pi, 
+    // The more points we generate, the closer we get to the actual value of Pi,
     // but the improvement becomes smaller and smaller as we increase the number of points
-    /*int N = 100000;                 
+    /*int N = 100000;
 
     int runs = 0;
     while (true) {
@@ -52,7 +52,7 @@ int main() {
 
 
     // Stratified estimate will be better (more accurate), especially for smaller sample sizes
-    // We can use this in our ray tracing algorithm to stratify the locations of the sampling positions around each pixel location, 
+    // We can use this in our ray tracing algorithm to stratify the locations of the sampling positions around each pixel location,
     // which helps to reduce noise and improve the quality of the rendered image without needing to increase the number of samples
 
 }

@@ -1,29 +1,29 @@
 #ifndef PDF_H
 #define PDF_H
 
-#include "onb.h"
 #include "raytracing.h"
+#include "onb.h"
 #include "hittable.h"
 
 
-/** 
+/**
  * Abstract base class for probability density functions (PDFs) used in importance sampling.
  * A PDF defines a probability distribution over directions in 3D space, allowing for efficient
  * sampling of directions based on the material properties and scene geometry.
  */
 class pdf {
-  public:
+public:
     virtual ~pdf() {}
 
     virtual double value(const vec3& direction) const = 0;
     virtual vec3 generate() const = 0;
 };
 
-/** 
+/**
  * PDF for sampling directions uniformly on a sphere.
  */
 class sphere_pdf : public pdf {
-  public:
+public:
     sphere_pdf() {}
 
     double value(const vec3& direction) const override {
@@ -35,11 +35,11 @@ class sphere_pdf : public pdf {
     }
 };
 
-/** 
+/**
  * PDF for sampling directions according to a cosine distribution around the normal.
  */
 class cosine_pdf : public pdf {
-  public:
+public:
     cosine_pdf(const vec3& w) : uvw(w) {}
 
     double value(const vec3& direction) const override {
@@ -51,17 +51,17 @@ class cosine_pdf : public pdf {
         return uvw.transform(random_cosine_direction());
     }
 
-  private:
+private:
     onb uvw;
 };
 
-/** 
+/**
  * PDF for sampling directions towards a specific hittable object from a given origin point.
  */
 class hittable_pdf : public pdf {
-  public:
+public:
     hittable_pdf(const hittable& objects, const point3& origin)
-      : objects(objects), origin(origin)
+        : objects(objects), origin(origin)
     {}
 
     double value(const vec3& direction) const override {
@@ -72,16 +72,16 @@ class hittable_pdf : public pdf {
         return objects.random(origin);
     }
 
-  private:
+private:
     const hittable& objects;
     point3 origin;
 };
 
-/** 
+/**
  * PDF for sampling a mixture of two other PDFs, allowing for combined sampling strategies
  */
 class mixture_pdf : public pdf {
-  public:
+public:
     mixture_pdf(shared_ptr<pdf> p0, shared_ptr<pdf> p1) {
         p[0] = p0;
         p[1] = p1;
@@ -98,7 +98,7 @@ class mixture_pdf : public pdf {
             return p[1]->generate();
     }
 
-  private:
+private:
     shared_ptr<pdf> p[2];
 };
 

@@ -1,6 +1,7 @@
 #ifndef HITTABLE_H
 #define HITTABLE_H
 
+#include "raytracing.h"
 #include "BVH_AABB.h"
 
 class material;
@@ -10,7 +11,7 @@ class hittable; // forward declare so hit_record can hold a shared_ptr
  *  A record of a ray-object intersection, containing the relevant information
  */
 class hit_record {
-  public:
+public:
     point3 p;
     vec3 normal;
     shared_ptr<material> mat;
@@ -31,7 +32,7 @@ class hit_record {
  * An abstract class representing any object that can be hit by a ray.
  */
 class hittable {
-  public:
+public:
     virtual ~hittable() = default;
 
     virtual bool hit(const ray& r, interval ray_t, hit_record& rec) const = 0;
@@ -62,7 +63,7 @@ class hittable {
 
 // A hittable that translates another hittable by a given offset
 class translate : public hittable {
-  public:
+public:
     translate(shared_ptr<hittable> object, const vec3& offset) : object(object), offset(offset)
     {
         bbox = object->bounding_box() + offset;
@@ -85,7 +86,7 @@ class translate : public hittable {
 
     bvh_aabb bounding_box() const override { return bbox; }
 
-  private:
+private:
     shared_ptr<hittable> object;
     vec3 offset;
     bvh_aabb bbox;
@@ -93,9 +94,9 @@ class translate : public hittable {
 
 
 class rotate_y : public hittable {
-  public:
+public:
     rotate_y(shared_ptr<hittable> object, double angle) : object(object) {
-        // Init sin and cos variables and empty bbox
+        // Init sin and cos variables and the bbox of the unrotated object
         auto radians = degrees_to_radians(angle);
         sin_theta = std::sin(radians);
         cos_theta = std::cos(radians);
@@ -127,7 +128,7 @@ class rotate_y : public hittable {
 
         bbox = bvh_aabb(min, max);
     }
-    
+
 
     bool hit(const ray& r, interval ray_t, hit_record& rec) const override {
 
@@ -154,7 +155,7 @@ class rotate_y : public hittable {
         rec.p = point3(
             (cos_theta * rec.p.x()) + (sin_theta * rec.p.z()),          // x′ = cos(theta) * x + sin(theta) * z
             rec.p.y(),
-            (-sin_theta * rec.p.x()) + (cos_theta * rec.p.z())          // z′ = −sin(theta) * x + cos(theta) * z 
+            (-sin_theta * rec.p.x()) + (cos_theta * rec.p.z())          // z′ = −sin(theta) * x + cos(theta) * z
         );
 
         rec.normal = vec3(
@@ -169,7 +170,7 @@ class rotate_y : public hittable {
 
     bvh_aabb bounding_box() const override { return bbox; }
 
-  private:
+private:
     shared_ptr<hittable> object;
     double sin_theta;
     double cos_theta;

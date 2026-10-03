@@ -8,7 +8,7 @@
 namespace vkgpu {
 
 /**
- * Constructor for the PathTracer class. 
+ * Constructor for the PathTracer class.
  * Initializes the implementation with the provided RenderConfig.
  */
 PathTracer::PathTracer(RenderConfig config)
@@ -32,8 +32,8 @@ PathTracer::Impl::~Impl() {
 }
 
 /**
- * Main function that runs the path tracing process. 
- * It initializes the scene and camera data, sets up Vulkan resources, 
+ * Main function that runs the path tracing process.
+ * It initializes the scene and camera data, sets up Vulkan resources,
  * dispatches the compute shader, and writes the output image to a file.
  */
 void PathTracer::Impl::run() {

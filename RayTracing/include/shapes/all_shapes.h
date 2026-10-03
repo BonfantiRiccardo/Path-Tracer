@@ -1,3 +1,6 @@
+#ifndef ALL_SHAPES_H
+#define ALL_SHAPES_H
+
 #include "sphere.h"
 #include "cylinder.h"
 #include "AABB.h"
@@ -12,3 +15,5 @@
 #include "2D/disk.h"
 #include "2D/ellipse.h"
 #include "2D/annulus.h"
+
+#endif // ALL_SHAPES_H

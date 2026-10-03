@@ -3,7 +3,6 @@
 
 #include "scene_headers.h"
 
-#include "scene_headers.h"
 inline scene checkered_spheres_scene(int image_width, int samples_per_pixel, int max_depth) {
     scene result;
     auto& world = result.world;

@@ -6,11 +6,11 @@
 #include "planar_primitive.h"
 
 /**
- * A triangle class that inherits from the hittable interface. It represents a triangle in 3D space and implements the hit function to determine if a ray intersects with it. 
- * The hit function calculates the intersection point and normal vector at the hit point if an intersection occurs, using the Möller-Trumbore algorithm.
+ * A triangle class that inherits from planar_primitive. It represents a triangle in 3D space.
+ * planar_primitive::hit computes the intersection point and normal. This class only tests whether the barycentric coordinates lie inside the triangle.
  */
 class triangle : public planar_primitive {
-  public:
+public:
     triangle(const point3& Q, const vec3& u, const vec3& v, shared_ptr<material> mat) : planar_primitive(Q, u, v, mat) {
         set_bounding_box();
     }

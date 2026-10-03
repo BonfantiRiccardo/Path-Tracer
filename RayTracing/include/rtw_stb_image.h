@@ -6,15 +6,14 @@
     #pragma warning (push, 0)
 #endif
 
-#define STB_IMAGE_IMPLEMENTATION
-#define STBI_FAILURE_USERMSG
+// The stb_image implementation is compiled once in src/stb_image_impl.cpp.
 #include "external/stb_image.h"
 
 #include <cstdlib>
 #include <iostream>
 
 class rtw_image {
-  public:
+public:
     rtw_image() {}
 
     rtw_image(const char* image_filename) {
@@ -44,7 +43,7 @@ class rtw_image {
 
     ~rtw_image() {
         delete[] bdata;
-        STBI_FREE(fdata);
+        stbi_image_free(fdata);
     }
 
     bool load(const std::string& filename) {
@@ -78,7 +77,7 @@ class rtw_image {
         return bdata + y*bytes_per_scanline + x*bytes_per_pixel;
     }
 
-  private:
+private:
     const int      bytes_per_pixel = 3;
     float         *fdata = nullptr;         // Linear floating point pixel data
     unsigned char *bdata = nullptr;         // Linear 8-bit pixel data

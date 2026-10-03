@@ -1,9 +1,10 @@
-#ifndef VULKAN_GPU_RT__SCENE_H
-#define VULKAN_GPU_RT__SCENE_H
+#ifndef VULKAN_GPU_RT_SCENE_H
+#define VULKAN_GPU_RT_SCENE_H
 
 #include <array>
 #include <cstdint>
 #include <cstdlib>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -59,9 +60,9 @@ inline std::array<float, 3> mulColor(const std::array<float, 3>& a, const std::a
 }
 
 /**
- * Creates a scene description that resembles the final scene from the "Ray Tracing in a Weekend" book. 
- * The scene consists of a large ground sphere and many smaller spheres with random positions and materials. 
- * There are also three larger spheres with specific materials placed in the center of the scene. 
+ * Creates a scene description that resembles the final scene from the "Ray Tracing in One Weekend" book.
+ * The scene consists of a large ground sphere and many smaller spheres with random positions and materials.
+ * There are also three larger spheres with specific materials placed in the center of the scene.
  * The camera is positioned to look at the center of the scene from a distance.
  */
 inline SceneDescription makeWeekendFinalScene() {
@@ -130,13 +131,16 @@ inline SceneDescription makeTwoSphereScene() {
 }
 
 inline SceneDescription buildSceneByName(const std::string& sceneName) {
+    if (sceneName == "weekend") {
+        return makeWeekendFinalScene();
+    }
     if (sceneName == "two-sphere") {
         return makeTwoSphereScene();
     }
 
-    return makeWeekendFinalScene();
+    throw std::runtime_error("Unknown scene: " + sceneName + " (available: weekend, two-sphere)");
 }
 
 }  // namespace vkgpu
 
-#endif  // VULKAN_GPU_RT__SCENE_H
+#endif  // VULKAN_GPU_RT_SCENE_H

@@ -27,7 +27,7 @@ inline scene bouncing_spheres_scene(int image_width, int samples_per_pixel, int 
                     auto albedo = color::random() * color::random();
                     sphere_material = make_shared<lambertian>(albedo);
                     auto center2 = center + vec3(0, random_double(0,.5), 0);
-                    world.add(make_shared<sphere>(center, center2, 0.2, sphere_material));                
+                    world.add(make_shared<sphere>(center, center2, 0.2, sphere_material));
                 }
                 else if (choose_mat < 0.95)
                 {

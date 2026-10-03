@@ -1,5 +1,5 @@
-#ifndef BVH_H
-#define BVH_H
+#ifndef BVH_NODE_H
+#define BVH_NODE_H
 
 #include "BVH_AABB.h"
 #include "hittable.h"
@@ -8,12 +8,12 @@
 #include <algorithm>
 
 /**
- * A BVH node that recursively partitions a list of hittable objects into a binary tree structure for efficient ray intersection tests. 
- * Each node contains a bounding box that encloses all objects in its subtree, and pointers to its left and right child nodes. 
+ * A BVH node that recursively partitions a list of hittable objects into a binary tree structure for efficient ray intersection tests.
+ * Each node contains a bounding box that encloses all objects in its subtree, and pointers to its left and right child nodes.
  * The hit function first checks for intersection with the bounding box, and if it hits, it recursively checks the left and right children.
  */
 class bvh_node : public hittable {
-  public:
+public:
     bvh_node(hittable_list list) : bvh_node(list.objects, 0, list.objects.size()) {
         // There's a C++ subtlety here. This constructor (without span indices) creates an
         // implicit copy of the hittable list, which we will modify. The lifetime of the copied
@@ -62,7 +62,7 @@ class bvh_node : public hittable {
 
     bvh_aabb bounding_box() const override { return bbox; }
 
-  private:
+private:
     shared_ptr<hittable> left;
     shared_ptr<hittable> right;
     bvh_aabb bbox;
@@ -90,4 +90,4 @@ class bvh_node : public hittable {
     }
 };
 
-#endif
+#endif // BVH_NODE_H

@@ -126,8 +126,7 @@ inline shared_ptr<material> gltf_material_for_primitive(const std::filesystem::p
 
     // Metallic surfaces map to the existing `metal` material. This uses a single
     // tint (base_color_factor) and a scalar roughness -> fuzz, NOT the per-texel
-    // metallic-roughness map; a faithful mapping needs a microfacet BRDF (see
-    // future-work.md section C).
+    // metallic-roughness map; a faithful mapping needs a microfacet BRDF.
     if (pbr.metallic_factor > 0.5) {
         const color tint(pbr.base_color_factor[0], pbr.base_color_factor[1], pbr.base_color_factor[2]);
         const double fuzz = pbr.roughness_factor * pbr.roughness_factor;

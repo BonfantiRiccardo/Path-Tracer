@@ -2,20 +2,19 @@
 #define BVH_AABB_H
 
 #include "raytracing.h"
-#include "hittable.h"
 
 /**
- * A BVH_AABB class that represents an axis-aligned bounding box used in a Bounding Volume Hierarchy (BVH) for efficient ray-object intersection tests. 
+ * A BVH_AABB class that represents an axis-aligned bounding box used in a Bounding Volume Hierarchy (BVH) for efficient ray-object intersection tests.
  * It contains three intervals representing the bounds along the x, y, and z axes, and implements a hit function to determine if a ray intersects with the bounding box.
  */
 class bvh_aabb {
-  public:
+public:
     interval x, y, z;
 
     bvh_aabb() {} // The default BVH_AABB is empty, since intervals are empty by default.
 
     bvh_aabb(const interval& x, const interval& y, const interval& z)
-      : x(x), y(y), z(z)     {
+        : x(x), y(y), z(z) {
         pad_to_minimums();
     }
 
@@ -81,25 +80,25 @@ class bvh_aabb {
 
     static const bvh_aabb empty, universe;
 
-    private:
-        void pad_to_minimums() {
-            // Adjust the AABB so that no side is narrower than some delta, padding if necessary.
+private:
+    void pad_to_minimums() {
+        // Adjust the AABB so that no side is narrower than some delta, padding if necessary.
 
-            double delta = 0.0001;
-            if (x.size() < delta)    x = x.expand(delta);
-            if (y.size() < delta)    y = y.expand(delta);
-            if (z.size() < delta)    z = z.expand(delta);
-        }
+        double delta = 0.0001;
+        if (x.size() < delta)    x = x.expand(delta);
+        if (y.size() < delta)    y = y.expand(delta);
+        if (z.size() < delta)    z = z.expand(delta);
+    }
 };
 
-const bvh_aabb bvh_aabb::empty    = bvh_aabb(interval::empty,    interval::empty,    interval::empty);
-const bvh_aabb bvh_aabb::universe = bvh_aabb(interval::universe, interval::universe, interval::universe);
+inline const bvh_aabb bvh_aabb::empty    = bvh_aabb(interval::empty,    interval::empty,    interval::empty);
+inline const bvh_aabb bvh_aabb::universe = bvh_aabb(interval::universe, interval::universe, interval::universe);
 
-bvh_aabb operator+(const bvh_aabb& bbox, const vec3& offset) {
+inline bvh_aabb operator+(const bvh_aabb& bbox, const vec3& offset) {
     return bvh_aabb(bbox.x + offset.x(), bbox.y + offset.y(), bbox.z + offset.z());
 }
 
-bvh_aabb operator+(const vec3& offset, const bvh_aabb& bbox) {
+inline bvh_aabb operator+(const vec3& offset, const bvh_aabb& bbox) {
     return bbox + offset;
 }
 

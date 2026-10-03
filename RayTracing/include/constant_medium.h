@@ -8,18 +8,18 @@
 // A hittable that represents a volume with constant density used to model effects like fog or smoke
 // It is defined by a boundary (another hittable) and a density value
 class constant_medium : public hittable {
-  public:
+public:
     constant_medium(shared_ptr<hittable> boundary, double density, shared_ptr<texture> tex)
-      : boundary(boundary), neg_inv_density(-1/density),
-        phase_function(make_shared<isotropic>(tex))
+        : boundary(boundary), neg_inv_density(-1/density),
+          phase_function(make_shared<isotropic>(tex))
     {}
 
     constant_medium(shared_ptr<hittable> boundary, double density, const color& albedo)
-      : boundary(boundary), neg_inv_density(-1/density),
-        phase_function(make_shared<isotropic>(albedo))
+        : boundary(boundary), neg_inv_density(-1/density),
+          phase_function(make_shared<isotropic>(albedo))
     {}
 
-    // Scatter the ray as it travels through the medium. Returns true if the ray is scattered and sets attenuation and scattered.
+    // Sample a scattering point inside the medium. Returns true if the ray scatters before leaving the boundary and stores that point in rec.
     bool hit(const ray& r, interval ray_t, hit_record& rec) const override {
         hit_record rec1, rec2;
 
@@ -57,7 +57,7 @@ class constant_medium : public hittable {
 
     bvh_aabb bounding_box() const override { return boundary->bounding_box(); }
 
-  private:
+private:
     shared_ptr<hittable> boundary;              // boundary is defined by a hittable object that encloses the volume (like sphere or box)
     double neg_inv_density;                     // negative inverse of the density, used to compute the distance to the next scattering event based on an exponential distribution
     shared_ptr<material> phase_function;        // isotropic material that models the scattering behavior of the medium

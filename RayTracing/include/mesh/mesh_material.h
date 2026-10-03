@@ -8,14 +8,14 @@
  * emissiveFactor * emissiveStrength on top of an emissive texture.
  */
 class scaled_texture : public texture {
-  public:
+public:
     scaled_texture(shared_ptr<texture> tex, const color& scale) : tex(tex), scale(scale) {}
 
     color value(double u, double v, const point3& p) const override {
         return scale * tex->value(u, v, p);
     }
 
-  private:
+private:
     shared_ptr<texture> tex;
     color scale;
 };
@@ -30,9 +30,9 @@ class scaled_texture : public texture {
  * pure emitter and lose the base color wherever the emissive map is black.
  */
 class lambertian_emissive : public material {
-  public:
+public:
     lambertian_emissive(shared_ptr<texture> base, shared_ptr<texture> emit)
-      : base(base), emit(emit) {}
+        : base(base), emit(emit) {}
 
     bool scatter(const ray& r_in, const hit_record& rec, scatter_record& srec) const override {
         srec.attenuation = base->value(rec.u, rec.v, rec.p);
@@ -52,7 +52,7 @@ class lambertian_emissive : public material {
         return emit->value(u, v, p);
     }
 
-  private:
+private:
     shared_ptr<texture> base;
     shared_ptr<texture> emit;
 };

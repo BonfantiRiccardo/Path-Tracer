@@ -14,7 +14,7 @@
  * scene from many worker threads concurrently.
  */
 class triangle_mesh : public hittable {
-  public:
+public:
     triangle_mesh() = default;
 
     explicit triangle_mesh(const std::vector<shared_ptr<hittable>>& triangle_objects) {
@@ -57,7 +57,7 @@ class triangle_mesh : public hittable {
 
     size_t triangle_count() const { return triangles.objects.size(); }
 
-  private:
+private:
     hittable_list triangles;
     shared_ptr<hittable> acceleration;
     bvh_aabb bbox = bvh_aabb::empty;

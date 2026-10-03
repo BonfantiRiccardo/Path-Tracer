@@ -31,7 +31,7 @@ function(raytracing_add_executable target_name)
     )
 endfunction()
 
-raytracing_add_executable(main src/main.cpp src/cgltf_impl.cpp src/tinyobj_impl.cpp)
+raytracing_add_executable(main src/main.cpp src/cgltf_impl.cpp src/tinyobj_impl.cpp src/stb_image_impl.cpp)
 
 # Mirror the asset folders (models/, images/) next to the main executable so
 # they can be loaded relative to the binary, independent of the working

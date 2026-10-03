@@ -9,7 +9,7 @@
 namespace vkgpu {
 
 /**
- * Struct representing the push constants passed to the compute shader. 
+ * Struct representing the push constants passed to the compute shader.
  * Contains parameters for image dimensions, sphere count, rendering settings, and a random seed.
  */
 struct PushConstants {
@@ -44,7 +44,7 @@ struct alignas(16) GpuCamera {
 };
 
 /**
- * Struct representing a pixel in the output image. 
+ * Struct representing a pixel in the output image.
  * Each channel is a float to allow for high dynamic range values before tonemapping.
  */
 struct OutputPixel {

@@ -6,8 +6,8 @@
 #include <iostream>
 
 /**
- * Entry point for the Vulkan GPU Path Tracer application. 
- * Parses command-line arguments, initializes the path tracer, and runs the rendering process. 
+ * Entry point for the Vulkan GPU Path Tracer application.
+ * Parses command-line arguments, initializes the path tracer, and runs the rendering process.
  * Catches and reports any exceptions that occur during execution.
  */
 int main(int argc, char** argv) {

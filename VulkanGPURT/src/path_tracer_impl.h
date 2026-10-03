@@ -14,7 +14,7 @@
 namespace vkgpu {
 
 /**
- * Internal implementation class for the PathTracer application. 
+ * Internal implementation class for the PathTracer application.
  * Encapsulates all Vulkan resources, scene data, and rendering logic.
  */
 class PathTracer::Impl {

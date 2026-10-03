@@ -5,7 +5,7 @@
  * A class representing an interval on the real line.
  */
 class interval {
-  public:
+public:
     double min, max;
 
     interval() : min(+infinity), max(-infinity) {} // Default interval is empty
@@ -50,7 +50,7 @@ class interval {
     }
 
     /**
-     * Expands the interval by a given delta on both sides.
+     * Expands the interval by delta in total (delta/2 on each side).
      */
     interval expand(double delta) const {
         auto padding = delta/2;
@@ -60,14 +60,14 @@ class interval {
     static const interval empty, universe;
 };
 
-const interval interval::empty    = interval(+infinity, -infinity); // Empty interval has min > max, so it contains no points.
-const interval interval::universe = interval(-infinity, +infinity); // Universe interval contains all real numbers.
+inline const interval interval::empty    = interval(+infinity, -infinity); // Empty interval has min > max, so it contains no points.
+inline const interval interval::universe = interval(-infinity, +infinity); // Universe interval contains all real numbers.
 
-interval operator+(const interval& ival, double displacement) {
+inline interval operator+(const interval& ival, double displacement) {
     return interval(ival.min + displacement, ival.max + displacement);
 }
 
-interval operator+(double displacement, const interval& ival) {
+inline interval operator+(double displacement, const interval& ival) {
     return ival + displacement;
 }
 
